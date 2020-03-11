@@ -660,7 +660,7 @@ for pageno in range(1,lastPageNo):
 <li>Inspecting the html tags where our information lies, by using Google Chrome&rsquo;s <em>inspect</em> option</li>
 <li>Collecting information that would distinguish our target HTML tag/s from others</li>
 </ul>
-<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <div> with class <em>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</em>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <code>html&lt;div class=&quot;&quot;&gt;</code> information mentioned.</p>
+<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <code>&lt;div&gt;</code> with class <em>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</em>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <code>&lt;div class=&quot;&quot;&gt;</code> information mentioned.</p>
 <p><img src="salaryBlocks.png" alt="salary blocks enclosed in divs"></p>
 <p>We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
 These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.</p>

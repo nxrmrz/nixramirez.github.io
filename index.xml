@@ -156,7 +156,7 @@ for pageno in range(1,lastPageNo):
 &lt;li&gt;Inspecting the html tags where our information lies, by using Google Chrome&amp;rsquo;s &lt;em&gt;inspect&lt;/em&gt; option&lt;/li&gt;
 &lt;li&gt;Collecting information that would distinguish our target HTML tag/s from others&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a &lt;div&gt; with class &lt;em&gt;&amp;ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&amp;rdquo;&lt;/em&gt;. To grab each salary block from a page, we then use BeautifulSoup&amp;rsquo;s findAll() method, passing on the &lt;code&gt;html&amp;lt;div class=&amp;quot;&amp;quot;&amp;gt;&lt;/code&gt; information mentioned.&lt;/p&gt;
+&lt;p&gt;Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; with class &lt;em&gt;&amp;ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&amp;rdquo;&lt;/em&gt;. To grab each salary block from a page, we then use BeautifulSoup&amp;rsquo;s findAll() method, passing on the &lt;code&gt;&amp;lt;div class=&amp;quot;&amp;quot;&amp;gt;&lt;/code&gt; information mentioned.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;salaryBlocks.png&#34; alt=&#34;salary blocks enclosed in divs&#34;&gt;&lt;/p&gt;
 &lt;p&gt;We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
 These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.&lt;/p&gt;
