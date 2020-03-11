@@ -627,8 +627,8 @@ from itertools import zip_longest
 <a href="https://www.glassdoor.co.nz/Salaries/index.htm" target="_blank" rel="noopener">Glassdoor&rsquo;s Salaries page</a>
  and type in whatever Job Title we&rsquo;d want salaries for, in whatever location. In this example, we&rsquo;d want to grab Data Engineers&rsquo; salary information from the United States. We have to be logged into a Glassdoor account to do this.</p>
 <p>We then copy paste the URL of the resulting page into the driver.get(url) method below.</p>
-<p>Next, we find the <em>last page of results</em> Glassdoor has for this particular search. This is important as we&rsquo;re setting up our browser to automatically cycle through all pages of the search, grabbing salary information from each. We do this by modifying the URL in our browser, adding the string <em>_IP1500</em> just before the <em>.htm</em>. * this lets us jump to the very last page of salary information, as it is likely that there won&rsquo;t be 1500 pages worth of search results. If there is, just adjust the IP number to be larger.</p>
-<p><em>Once we&rsquo;ve jumped to the last page of results,</em> note down what that page is (by looking at the last number in the carousel button as such (red in the image below):</p>
+<p>Next, we find the <em>last page of results</em> Glassdoor has for this particular search. This is important as we&rsquo;re setting up our browser to automatically cycle through all pages of the search, grabbing salary information from each. We do this by modifying the URL in our browser, adding the string <em>_IP1500</em> just before the <em>.htm</em>. This lets us jump to the very last page of salary information, as it is likely that there won&rsquo;t be 1500 pages worth of search results. If there is, just adjust the IP number to be larger.</p>
+<p>Once we&rsquo;ve jumped to the last page of results, note down what that page is (by looking at the last number in the carousel button as such (red in the image below):</p>
 <p><img src="LastPageScrape.png" alt="last page scraping"></p>
 <p>and copying that number onto the lastPageNo variable in the below code. In below&rsquo;s example, page 191 is the last page, and the for loop cycles through each page until it reaches that, employing a delay of at least 1.5s before it goes on to the next page.</p>
 <pre><code class="language-python">#creating empty arrays to hold job title, company name, job mean pay and pay range information
@@ -660,7 +660,7 @@ for pageno in range(1,lastPageNo):
 <li>Inspecting the html tags where our information lies, by using Google Chrome&rsquo;s <em>inspect</em> option</li>
 <li>Collecting information that would distinguish our target HTML tag/s from others</li>
 </ul>
-<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <div> with class <em>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</em>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <div class=""> information mentioned.</p>
+<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <div> with class <em>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</em>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <code>html&lt;div class=&quot;&quot;&gt;</code> information mentioned.</p>
 <p><img src="salaryBlocks.png" alt="salary blocks enclosed in divs"></p>
 <p>We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
 These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.</p>
