@@ -79,6 +79,138 @@
     </item>
     
     <item>
+      <title>Web Scraping</title>
+      <link>https://nixramirez.github.io/project/data-scraping/</link>
+      <pubDate>Thu, 27 Feb 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/data-scraping/</guid>
+      <description>&lt;h3 id=&#34;the-idea&#34;&gt;The Idea&lt;/h3&gt;
+&lt;p&gt;An ex-colleague, 
+&lt;a href=&#34;https://www.linkedin.com/in/dhilip-subramanian-36021918b/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dhilip&lt;/a&gt;
+ and I wanted to do a series of end-to-end projects in Data Science and Analytics for fun and to pick up skills along the way that would serve our future careers in this space. When Dhilip approached me for project ideas, I already had one I&amp;rsquo;ve thought about for quite some time.&lt;/p&gt;
+&lt;p&gt;It was a timely project for us Qrious interns, who were deliberating on our next career move following the summer internship. Towards the end of our internship, a few of us (excluding me but including Dhilip) were graduating and applying for full-time jobs in the data space. Our discussions naturally gravitated to what starting pay we could expect for careers in data science, data engineering, and analytics. I imagined if we had an amount for each job averaged from recent, accurate salary data collected over a large number of companies operating in different industries, we had evidence to make sure future salary negotiations were fair!&lt;/p&gt;
+&lt;h3 id=&#34;the-execution&#34;&gt;The Execution&lt;/h3&gt;
+&lt;p&gt;Glassdoor is a job reviews site with job benefits and salary information reported anonymously by employees of various companies. It was our main data source for this project. Collecting a vast amount of data from the site would require automation, using a technique called &lt;em&gt;scraping&lt;/em&gt;. This is a technique used to extract content from specific HTML tags in a webpage, and in our case, exploits two technologies to do so: Selenium and BeautifulSoup.&lt;/p&gt;
+&lt;p&gt;Selenium is a Java-based tool used in website testing to automate specific interactions with webpages (i.e. clicking on links, logging in, navigating the page, etc). Since it automates interacting with the DOM, it&amp;rsquo;s being used in Data Science to scrape data from websites. BeautifulSoup, on the other hand, is a Python library that parses HTML and makes it easy to extract specific elements from it.&lt;/p&gt;
+&lt;h3 id=&#34;the-code&#34;&gt;The code&lt;/h3&gt;
+&lt;h4 id=&#34;1-first-we-import-the-necessary-libraries&#34;&gt;1. First, we import the necessary libraries:&lt;/h4&gt;
+&lt;p&gt;&lt;em&gt;Python Selenium libraries (Scraping)&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;webdriver - contains tools for working with an automated web browser&lt;/li&gt;
+&lt;li&gt;webdriver.chrome - specifies Google Chrome as our automated browser&lt;/li&gt;
+&lt;li&gt;time - the sleep function allows our automated tasks (i.e. clicking on links) to have a delay. Important for not being blocked as a bot by some websites&lt;/li&gt;
+&lt;li&gt;BeautifulSoup - a python library for parsing HTML pages and grabbing content from specific HTML tags easily&lt;/li&gt;
+&lt;li&gt;lxml - a parser for BeautifulSoup, allowing the HTML pages to be parsed as xml (and queried with xPath)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Standard Python Libraries&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;pandas - a library for working with data-frames&lt;/li&gt;
+&lt;li&gt;csv - a tool for reading and writing CSV files&lt;/li&gt;
+&lt;li&gt;itertools - an iterator library&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from selenium import webdriver 
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from time import sleep
+from bs4 import BeautifulSoup
+import lxml
+
+import pandas as pd 
+import csv
+from itertools import zip_longest
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;2-then-we-set-up-an-automated-browser-for-scraping&#34;&gt;2. Then, we set up an automated browser for scraping&lt;/h4&gt;
+&lt;p&gt;In this step, we navigate to 
+&lt;a href=&#34;https://www.glassdoor.co.nz/Salaries/index.htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Glassdoor&amp;rsquo;s Salaries page&lt;/a&gt;
+ and type in whatever Job Title we&amp;rsquo;d want salaries for, in whatever location. In this example, we&amp;rsquo;d want to grab Data Engineers&amp;rsquo; salary information from the United States. We have to be logged into a Glassdoor account to do this.&lt;/p&gt;
+&lt;p&gt;We then copy paste the URL of the resulting page into the driver.get(url) method below.&lt;/p&gt;
+&lt;p&gt;Next, we find the &lt;em&gt;last page of results&lt;/em&gt; Glassdoor has for this particular search. This is important as we&amp;rsquo;re setting up our browser to automatically cycle through all pages of the search, grabbing salary information from each. We do this by modifying the URL in our browser, adding the string &lt;em&gt;_IP1500&lt;/em&gt; just before the &lt;em&gt;.htm&lt;/em&gt;. * this lets us jump to the very last page of salary information, as it is likely that there won&amp;rsquo;t be 1500 pages worth of search results. If there is, just adjust the IP number to be larger.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Once we&amp;rsquo;ve jumped to the last page of results,&lt;/em&gt; note down what that page is (by looking at the last number in the carousel button as such (red in the image below):&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;LastPageScrape.png&#34; alt=&#34;last page scraping&#34;&gt;&lt;/p&gt;
+&lt;p&gt;and copying that number onto the lastPageNo variable in the below code. In below&amp;rsquo;s example, page 191 is the last page, and the for loop cycles through each page until it reaches that, employing a delay of at least 1.5s before it goes on to the next page.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#creating empty arrays to hold job title, company name, job mean pay and pay range information
+job_title = []
+company_name = []
+mean_pay = []
+pay_range = []
+
+lastPageNo = 191;
+
+#going through 184 pages of salary information
+for pageno in range(1,lastPageNo):
+
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    
+    #getting webpage in glassdoor
+    if pageno == 1:
+        driver.get(&amp;quot;https://www.glassdoor.co.nz/Salaries/us-data-engineer-salary-SRCH_IL.0,2_IN1_KO3,16.htm&amp;quot;)
+    else:
+        driver.get(
+            &amp;quot;https://www.glassdoor.co.nz/Salaries/us-data-engineer-salary-SRCH_IL.0,2_IN1_KO3,16.htm&amp;quot; + &amp;quot;_IP&amp;quot; + str(pageno) + &amp;quot;.htm&amp;quot;
+        )
+    time.sleep(1.5)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;3-we-parse-the-html-of-each-search-result-pageand-scrape&#34;&gt;3. We parse the HTML of each search result page&amp;hellip;and SCRAPE!&lt;/h4&gt;
+&lt;p&gt;&amp;hellip;Using Beautifulsoup. The &lt;em&gt;page_source&lt;/em&gt; attribute of the driver grabs the page with its corresponding HTML tags, and parses it with &lt;em&gt;lxml&lt;/em&gt;, which as mentioned above, allows us to query the results using xpath if we wished.&lt;/p&gt;
+&lt;p&gt;After parsing, we then grab specific HTML content. We do this by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Inspecting the html tags where our information lies, by using Google Chrome&amp;rsquo;s &lt;em&gt;inspect&lt;/em&gt; option&lt;/li&gt;
+&lt;li&gt;Collecting information that would distinguish our target HTML tag/s from others&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a &lt;div&gt; with class &lt;em&gt;&amp;ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&amp;rdquo;&lt;/em&gt;. To grab each salary block from a page, we then use BeautifulSoup&amp;rsquo;s findAll() method, passing on the &lt;div class=&#34;&#34;&gt; information mentioned.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;salaryBlocks.png&#34; alt=&#34;salary blocks enclosed in divs&#34;&gt;&lt;/p&gt;
+&lt;p&gt;We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
+These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;    #continuation from code above (still inside the for loop)
+    #parsing the page through lxml option of beautifulsoup
+    html = driver.page_source
+    soup = BeautifulSoup(html, &#39;lxml&#39;)
+
+    #getting each salary block
+    salaryBlocks = soup.findAll(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;row align-items-center m-0 salaryRow__SalaryRowStyle__row&#39;})
+
+    #for each salary block, find the job title, company name, average pay, and pay range, and append them to the lists initialised above
+    for block in salaryBlocks:
+        entry = []
+
+        jobTitle = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;salaryRow__JobInfoStyle__jobTitle strong&#39;}).find(&amp;quot;a&amp;quot;).text
+        job_title.append(jobTitle)
+
+        companyName = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;salaryRow__JobInfoStyle__employerName&#39;}).text
+        company_name.append(companyName)
+
+        meanPay = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;salaryRow__JobInfoStyle__meanBasePay common__formFactorHelpers__showHH&#39;}).find(&#39;span&#39;).text
+        mean_pay.append(meanPay)
+        
+        #if a pay range exists, grab it, otherwise, indicate none exists
+        try:
+            if block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt&#39;}).find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;strong&#39;}):
+                payRange = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt&#39;}).find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;strong&#39;}).text
+                pay_range.append(payRange)
+            elif block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt&#39;}).find(&amp;quot;span&amp;quot;, {&#39;class&#39; : &#39;strong&#39;}):
+                pay_range.append(&amp;quot;N/A&amp;quot;)
+        except:
+            pay_range.append(&amp;quot;N/A&amp;quot;)
+
+        driver.quit()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4-we-save-the-results-to-a-csv-file&#34;&gt;4. We save the results to a .csv file&lt;/h4&gt;
+&lt;p&gt;Once we&amp;rsquo;ve obtained all the information we need, we store them into a python data-frame, which allows us to store the data in a tabular format. The columns of the table correspond to job title, company name, mean pay, and the pay range, whilst the rows are individual companies.&lt;/p&gt;
+&lt;p&gt;The below code shows how the results are stored in a data-frame and eventually converted to a .csv file for easy reading into your favourite data analysis program/language later on.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#process the lists into a final dataframe, and save to a CSV
+final = []
+for item in zip_longest(job_title, company_name, mean_pay, pay_range):
+    final.append(item)
+
+df = pd.DataFrame(
+    final, columns=[&#39;jobTitle&#39;, &#39;companyName&#39;, &#39;meanPay&#39;, &#39;payRange&#39;])
+
+df.to_csv(&amp;quot;Data Engineer Salaries United States.csv&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;The final output of this scraping is a 28,000 row file, containing salary information for Data Engineers, Analysts, Scientists, and Machine Learning Engineers in Australia, New Zealand, and the United States. The file can be downloaded &lt;a href=&#34;https://nixramirez.github.io/files/Data-Professional-Salaries-Master.csv&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt; for free :)&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Writing technical content in Academic</title>
       <link>https://nixramirez.github.io/post/writing-technical-content/</link>
       <pubDate>Fri, 12 Jul 2019 00:00:00 +0000</pubDate>
@@ -768,100 +900,6 @@ Three
 &lt;p&gt;Supplementary notes can be added here, including 
 &lt;a href=&#34;https://sourcethemes.com/academic/docs/writing-markdown-latex/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;code and math&lt;/a&gt;
 .&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Web Scraping</title>
-      <link>https://nixramirez.github.io/project/data-scraping/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://nixramirez.github.io/project/data-scraping/</guid>
-      <description>&lt;h3 id=&#34;the-idea&#34;&gt;The Idea&lt;/h3&gt;
-&lt;p&gt;An ex-colleague, 
-&lt;a href=&#34;https://www.linkedin.com/in/dhilip-subramanian-36021918b/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dhilip&lt;/a&gt;
- and I wanted to do a series of end-to-end projects in Data Science and Analytics for fun and to pick up skills along the way that would serve our future careers in this space. When Dhilip approached me for project ideas, I already had one I&amp;rsquo;ve thought about for quite some time.&lt;/p&gt;
-&lt;p&gt;It was a timely project for us Qrious interns, who were deliberating on our next career move following the summer internship. Towards the end of our internship, a few of us (excluding me but including Dhilip) were graduating and applying for full-time jobs in the data space. Our discussions naturally gravitated to what starting pay we could expect for careers in data science, data engineering, and analytics. I imagined if we had an amount for each job averaged from recent, accurate salary data collected over a large number of companies operating in different industries, we had evidence to make sure future salary negotiations were fair!&lt;/p&gt;
-&lt;h3 id=&#34;the-execution&#34;&gt;The Execution&lt;/h3&gt;
-&lt;p&gt;Glassdoor is a job reviews site with job benefits and salary information reported anonymously by employees of various companies. It was our main data source for this project. Collecting a vast amount of data from the site would require automation, using a technique called &lt;em&gt;scraping&lt;/em&gt;. This is a technique used to extract content from specific HTML tags in a webpage, and in our case, exploits two technologies to do so: Selenium and BeautifulSoup.&lt;/p&gt;
-&lt;p&gt;Selenium is a Java-based tool used in website testing to automate specific interactions with webpages (i.e. clicking on links, logging in, navigating the page, etc). Since it automates interacting with the DOM, it&amp;rsquo;s being used in Data Science to scrape data from websites. BeautifulSoup, on the other hand, is a Python library that parses HTML and makes it easy to extract specific elements from it.&lt;/p&gt;
-&lt;h3 id=&#34;the-code&#34;&gt;The code&lt;/h3&gt;
-&lt;p&gt;A work in progress (explanations to follow:)&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import pandas as pd
-from time import sleep
-from bs4 import BeautifulSoup, Comment
-import time
-import os
-import csv
-import lxml
-from itertools import zip_longest
-from webdriver_manager.chrome import ChromeDriverManager
-
-#setting up an automated google chrome browser
-driver = webdriver.Chrome(ChromeDriverManager().install())
-
-job_title = []
-company_name = []
-mean_pay = []
-pay_range = []
-
-#going through 184 pages of salary information
-for pageno in range(1,184):
-
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    
-    #getting webpage in glassdoor
-    if pageno == 1:
-        driver.get(&amp;quot;https://www.glassdoor.co.nz/Salaries/us-data-engineer-salary-SRCH_IL.0,2_IN1_KO3,16.htm&amp;quot;)
-    else:
-        driver.get(
-            &amp;quot;https://www.glassdoor.co.nz/Salaries/us-data-engineer-salary-SRCH_IL.0,2_IN1_KO3,16.htm&amp;quot; + &amp;quot;_IP&amp;quot; + str(pageno) + &amp;quot;.htm&amp;quot;
-        )
-    time.sleep(1.5)
-
-    #parsing the page through lxml option of beautifulsoup
-    html = driver.page_source
-    soup = BeautifulSoup(html, &#39;lxml&#39;)
-
-    #getting each salary block
-    salaryBlocks = soup.findAll(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;row align-items-center m-0 salaryRow__SalaryRowStyle__row&#39;})
-
-    #for each salary block, find the job title, company name, average pay, and pay range, and append them to the lists initialised above
-    for block in salaryBlocks:
-        entry = []
-
-        jobTitle = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;salaryRow__JobInfoStyle__jobTitle strong&#39;}).find(&amp;quot;a&amp;quot;).text
-        job_title.append(jobTitle)
-
-        companyName = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;salaryRow__JobInfoStyle__employerName&#39;}).text
-        company_name.append(companyName)
-
-        meanPay = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;salaryRow__JobInfoStyle__meanBasePay common__formFactorHelpers__showHH&#39;}).find(&#39;span&#39;).text
-        mean_pay.append(meanPay)
-        
-        #if a pay range exists, grab it, otherwise, indicate none exists
-        try:
-            if block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt&#39;}).find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;strong&#39;}):
-                payRange = block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt&#39;}).find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;strong&#39;}).text
-                pay_range.append(payRange)
-            elif block.find(&amp;quot;div&amp;quot;, {&#39;class&#39; : &#39;col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt&#39;}).find(&amp;quot;span&amp;quot;, {&#39;class&#39; : &#39;strong&#39;}):
-                pay_range.append(&amp;quot;N/A&amp;quot;)
-        except:
-            pay_range.append(&amp;quot;N/A&amp;quot;)
-
-        driver.quit()
-
-#process the lists into a final dataframe, and save to a CSV
-final = []
-for item in zip_longest(job_title, company_name, mean_pay, pay_range):
-    final.append(item)
-
-df = pd.DataFrame(
-    final, columns=[&#39;jobTitle&#39;, &#39;companyName&#39;, &#39;meanPay&#39;, &#39;payRange&#39;])
-
-df.to_csv(&amp;quot;Data Engineer Salaries United States.csv&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

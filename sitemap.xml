@@ -33,6 +33,26 @@
   </url>
   
   <url>
+    <loc>https://nixramirez.github.io/tags/data-projects/</loc>
+    <lastmod>2020-02-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://nixramirez.github.io/project/</loc>
+    <lastmod>2020-02-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://nixramirez.github.io/tags/</loc>
+    <lastmod>2020-02-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://nixramirez.github.io/project/data-scraping/</loc>
+    <lastmod>2020-02-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://nixramirez.github.io/post/</loc>
     <lastmod>2019-09-05T00:00:00+00:00</lastmod>
   </url>
@@ -78,11 +98,6 @@
   </url>
   
   <url>
-    <loc>https://nixramirez.github.io/tags/</loc>
-    <lastmod>2019-04-17T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://nixramirez.github.io/post/jupyter/</loc>
     <lastmod>2019-09-05T00:00:00+00:00</lastmod>
   </url>
@@ -104,11 +119,6 @@
   
   <url>
     <loc>https://nixramirez.github.io/project/internal-project/</loc>
-    <lastmod>2016-04-27T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://nixramirez.github.io/project/</loc>
     <lastmod>2016-04-27T00:00:00+00:00</lastmod>
   </url>
   
@@ -159,14 +169,6 @@
   
   <url>
     <loc>https://nixramirez.github.io/courses/</loc>
-  </url>
-  
-  <url>
-    <loc>https://nixramirez.github.io/tags/data-projects/</loc>
-  </url>
-  
-  <url>
-    <loc>https://nixramirez.github.io/project/data-scraping/</loc>
   </url>
   
 </urlset>
