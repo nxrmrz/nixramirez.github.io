@@ -5,12 +5,37 @@
     <link>https://nixramirez.github.io/project/</link>
       <atom:link href="https://nixramirez.github.io/project/index.xml" rel="self" type="application/rss+xml" />
     <description>Projects</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 27 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 17 Apr 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Projects</title>
       <link>https://nixramirez.github.io/project/</link>
     </image>
+    
+    <item>
+      <title>Intro To Python Workshop</title>
+      <link>https://nixramirez.github.io/project/pythonworkshop/</link>
+      <pubDate>Fri, 17 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/pythonworkshop/</guid>
+      <description>&lt;p&gt;In this project, I taught an introductory workshop on Python&amp;rsquo;s base syntax, plus some basic libraries for working with data (i.e. pandas, numpy, matplotlib).&lt;/p&gt;
+&lt;p&gt;This was done for the University of Auckland Data Science Club, which I help run.&lt;/p&gt;
+&lt;p&gt;It was one workshop in a series teaching essential end-to-end data science skills. Workshops on Data Cleaning, Data Visualisation and Data modelling were planned for the future.&lt;/p&gt;
+&lt;p&gt;I work as a programming tutor, so I thought teaching such a workshop would be easy. &lt;strong&gt;It wasn&amp;rsquo;t!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Firstly, I had to come up with &lt;strong&gt;all&lt;/strong&gt; of the material on my own &amp;ndash; the recordings, the jupyter notebooks, the coding challenges, and sourcing the data-set. The recorded format also made it all the more daunting, as any mistakes I made would go on record officially! I also worried about delivering an engaging workshop. After all, the online nature of the workshop meant people could drop out anytime they wished.&lt;/p&gt;
+&lt;p&gt;We were surprised to see good engagement with this workshop, though, with people attending our Live Q&amp;amp;A sessions after the workshop to ask for help regarding our coding challenges. This suggested people were watching our videos &amp;lsquo;til the end. I&amp;rsquo;ve also received positive verbal feedback about the workshop from members, and the youtube view count for both videos suggested pretty good engagement!&lt;/p&gt;
+&lt;p&gt;This was such a rewarding experience, which highlighted a few things: 1.) Teaching isn&amp;rsquo;t easy 2.) Teaching is &lt;strong&gt;very hard&lt;/strong&gt; to get right 3.) I love teaching and sharing the beauty of programming.&lt;/p&gt;
+&lt;p&gt;So now I present, the University of Auckland Data Science Club&amp;rsquo;s Intro to Python workshop!&lt;/p&gt;
+&lt;h3 id=&#34;part-one-python-base-snytax&#34;&gt;Part One: Python Base Snytax&lt;/h3&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/S6hwKDvI24c&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;h3 id=&#34;part-two-python-for-data-science&#34;&gt;Part Two: Python for Data Science&lt;/h3&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/n9X6ObJ9kos&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;br&gt;
+&lt;p&gt;The materials accompanying the workshop are 
+&lt;a href=&#34;https://drive.google.com/drive/folders/1o3mH_-6ANT7EfiFWV31IXbhkc9P8VsAn?usp=sharing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;found here&lt;/a&gt;
+. These include the Jupyter notebooks used in both parts, a set of coding challenges to try after going through the workshop (and their associated answers), and the data-set used in part two.&lt;/p&gt;
+&lt;p&gt;Please reach out if you have any feedback or queries! :)&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Web Scraping</title>
