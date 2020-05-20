@@ -79,6 +79,30 @@
     </item>
     
     <item>
+      <title>Detecting Seasons in React.js</title>
+      <link>https://nixramirez.github.io/project/reactfirstproj/</link>
+      <pubDate>Sat, 02 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/reactfirstproj/</guid>
+      <description>&lt;p&gt;Here&amp;rsquo;s a proud moment - the first front-end I&amp;rsquo;ve built with React.js and JSX! It&amp;rsquo;s very simple, but it taught me a lot on how React worked internally.&lt;/p&gt;
+&lt;p&gt;This app displays either two screens dependent on whether it’s summer or winter wherever the user is currently.&lt;/p&gt;
+&lt;p&gt;A user in New Zealand (i.e. me) is in the southern hemisphere where it’s currenty winter (May 2nd, when this blogpost was written). The app displays the winter screen in this case.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;winterscreen.png&#34; alt=&#34;Winter Screen&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A user in San Francisco, on the other hand, is in the northern hemisphere where it’s currently summer. The app displays the summer screen for them.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;summerscreen.png&#34; alt=&#34;Summer Screen&#34;&gt;&lt;/p&gt;
+&lt;p&gt;How do we know where the user is? Well, we can detect user location with the 
+&lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Mozilla Geolocation API&lt;/a&gt;
+. We can grab latitude and longitude information about the user from this service.&lt;/p&gt;
+&lt;p&gt;We can also force the Google Chrome browser to consider a location like San Francisco away from us by changing its geolocation in its ‘Sensors’ tab like so (mostly for testing the different views):&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;forcelocationchange.png&#34; alt=&#34;Force location change&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If the user has disabled location-sharing in any-way, the screen below encourages them to enable it&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;acceptlocationscreen.png&#34; alt=&#34;Accept location screen&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Semantic UI and some CSS was used to style the webpage.&lt;/p&gt;
+&lt;p&gt;This project taught me React&amp;rsquo;s fundamentals - class based and functional components, the component life cycle methods, how to update component state, and how to passing information down from parent to children components using the props system.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;m currently building a more complex full-stack web app, integrating node.js/express.js for the back-end and a mongodb database. I might write a tutorial on that when it&amp;rsquo;s done, so if you&amp;rsquo;re interested, please stay tuned for that post! :)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Intro To Python Workshop</title>
       <link>https://nixramirez.github.io/project/pythonworkshop/</link>
       <pubDate>Fri, 17 Apr 2020 00:00:00 +0000</pubDate>
