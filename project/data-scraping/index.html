@@ -654,13 +654,13 @@ for pageno in range(1,lastPageNo):
     time.sleep(1.5)
 </code></pre>
 <h4 id="3-we-parse-the-html-of-each-search-result-pageand-scrape">3. We parse the HTML of each search result page&hellip;and SCRAPE!</h4>
-<p>&hellip;Using Beautifulsoup. The <em>page_source</em> attribute of the driver grabs the page with its corresponding HTML tags, and parses it with <em>lxml</em>, which as mentioned above, allows us to query the results using xpath if we wished.</p>
+<p>&hellip;Using Beautifulsoup. The <em>page_source</em> attribute of the driver grabs the page with its corresponding HTML tags, and parses it with <strong>lxml</strong>, which as mentioned above, allows us to query the results using xpath if we wished.</p>
 <p>After parsing, we then grab specific HTML content. We do this by:</p>
 <ul>
 <li>Inspecting the html tags where our information lies, by using Google Chrome&rsquo;s <em>inspect</em> option</li>
 <li>Collecting information that would distinguish our target HTML tag/s from others</li>
 </ul>
-<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <code>&lt;div&gt;</code> with class <em>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</em>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <code>&lt;div class=&quot;&quot;&gt;</code> information mentioned.</p>
+<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <code>&lt;div&gt;</code> with class <strong>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</strong>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <code>&lt;div class=&quot;&quot;&gt;</code> information mentioned.</p>
 <p><img src="salaryBlocks.png" alt="salary blocks enclosed in divs"></p>
 <p>We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
 These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.</p>

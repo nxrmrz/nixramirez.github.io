@@ -128,6 +128,1142 @@
     </item>
     
     <item>
+      <title>Multi-Class Emotion Classification with Deep Learning using BERT</title>
+      <link>https://nixramirez.github.io/project/bert-emotion-classification/</link>
+      <pubDate>Wed, 15 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/bert-emotion-classification/</guid>
+      <description>&lt;h3 id=&#34;helpful-prerequisites&#34;&gt;Helpful Prerequisites&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Intermediate-level knowledge of Python 3 (NumPy and Pandas preferably, but not required)&lt;/li&gt;
+&lt;li&gt;Exposure to PyTorch usage&lt;/li&gt;
+&lt;li&gt;Basic understanding of Deep Learning, Natural Language Processing (NLP) and Language Models (BERT specifically)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;project-outline&#34;&gt;Project Outline&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;: We implement transfer learning using BERT to achieve 98.6% accuracy on emotion classification of tweets. We show the whole end-to-end process in this notebook.&lt;/p&gt;
+&lt;p&gt;Feel free to click on the below links to skip to that section.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#introduction&#34;&gt;&lt;strong&gt;Task 1&lt;/strong&gt;: Introduction&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#eda&#34;&gt;&lt;strong&gt;Task 2&lt;/strong&gt;: Exploratory Data Analysis&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#preprocessing&#34;&gt;&lt;strong&gt;Task 3&lt;/strong&gt;: Data Pre-processing&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#trainvalsplit&#34;&gt;&lt;strong&gt;Task 4&lt;/strong&gt;: Training and Validation Split&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#tokenisation&#34;&gt;&lt;strong&gt;Task 5&lt;/strong&gt;: Loading Tokenizer and Encoding our Data&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#BERTsetup&#34;&gt;&lt;strong&gt;Task 6&lt;/strong&gt;: Setting up BERT Pretrained Model&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#dataloaders&#34;&gt;&lt;strong&gt;Task 7&lt;/strong&gt;: Creating Data Loaders&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#optimise&#34;&gt;&lt;strong&gt;Task 8&lt;/strong&gt;: Setting Up Optimizer and Scheduler&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#performancemetrics&#34;&gt;&lt;strong&gt;Task 9&lt;/strong&gt;: Defining our Performance Metrics&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#trainevalloops&#34;&gt;&lt;strong&gt;Task 10&lt;/strong&gt;: Creating our Training and Evaluation Loops&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;#evaluatemodel&#34;&gt;&lt;strong&gt;Task 11&lt;/strong&gt;: Loading and Evaluating our Model&lt;/a&gt;
+&lt;/p&gt;
+&lt;h1&gt;&lt;a id=&#34;introduction&#34;&gt;Task 1: Introduction&lt;/a&gt;&lt;/h1&gt;
+&lt;h3 id=&#34;the-problem&#34;&gt;The Problem&lt;/h3&gt;
+&lt;p&gt;Emotion classification, or the task of ascribing an emotion category to a textual document, is a typical NLP problem solved either through machine learning (ML) or deep learning (DL) methods. The popularity of the latter solution over the former has grown in recent years, as powerful language models utilising DL have been increasingly open-sourced and utilised, alongside the tools used to build and customise them.&lt;/p&gt;
+&lt;p&gt;NLP benefits from DL&amp;rsquo;s ability to preserve more context and require less feature-engineering than ML. There&amp;rsquo;s no free lunch, however, as utilising DL methods comes at a cost: more powerful computational resources are needed to run DL models, they may be less explainable than traditional ML ones, and model training and/or inference might take longer. Deciding which framework to use ultimately requires balancing these pros and cons.&lt;/p&gt;
+&lt;p&gt;A particularly exciting benefit of language models trained through DL, however, is their ability to learn large amounts of information from a huge data-source and &lt;strong&gt;transfer their learning&lt;/strong&gt; to solve tasks that aren&amp;rsquo;t necessarily within their training domain.&lt;/p&gt;
+&lt;p&gt;This concept of 
+&lt;a href=&#34;http://jalammar.github.io/illustrated-bert/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;transfer learning&lt;/a&gt;
+ has revolutionised NLP. In a nutshell, transfer learning involves training a large neural network on extremely large data-sets to learn rich, nuanced, generalisable information that it can transfer to a smaller model &lt;strong&gt;fine-tuned&lt;/strong&gt; to solve a specific task. With transfer learning, the smaller model performs better at this task and/or solves it quicker after gaining this external knowledge than if it was left alone to tackle the task.&lt;/p&gt;
+&lt;p&gt;State-of-the-art achievements in transfer learning were enabled by innovatively architected deep neural networks called 
+&lt;a href=&#34;http://jalammar.github.io/illustrated-transformer/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;transformers&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;In this notebook, we try to classify the emotion of tweets through leveraging the knowledge of a particular transformer-based model called BERT, trained and open-sourced by Google. BERT is a large-scale transformer-based Language Model that can be finetuned for a variety of tasks. It 
+&lt;a href=&#34;https://ai.googleblog.com/2018/11/open-sourcing-bert-state-of-art-pre.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;beat multiple NLP benchmarks during its release in 2018&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;Armed with the generalist language knowledge of BERT, we fine-tune BERT on 
+&lt;a href=&#34;https://figshare.com/articles/smile_annotations_final_csv/3187909&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;our own dataset&lt;/a&gt;
+, a collection of 3,085 tweets each classified according to 5 emotions (i.e. anger, disgust, happiness, surprise and sadness). This collection of tweets mentions 13 Twitter handles associated with British museums, and was gathered between May 2013 and June 2015. It was created for the purpose of classifying emotions, expressed on Twitter, towards arts and cultural experiences in museums.&lt;/p&gt;
+&lt;p&gt;Fine-tuning on this particular data-set allows us to classify a tweet into one of 5 emotion categories later on. We&amp;rsquo;ll tackle the technical details in relevant sections of this notebook.&lt;/p&gt;
+&lt;p&gt;For more information about BERT, the original publication for it is linked 
+&lt;a href=&#34;https://arxiv.org/abs/1810.04805&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;
+.&lt;/p&gt;
+&lt;p&gt;We are using 
+&lt;a href=&#34;https://huggingface.co/transformers/model_doc/bert.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Huggingface&amp;rsquo;s implementation of BERT&lt;/a&gt;
+ for this project, written in PyTorch.&lt;/p&gt;
+&lt;h1&gt;&lt;a id=&#34;eda&#34;&gt;Task 2: Exploratory Data Analysis&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;First, let&amp;rsquo;s make sure we&amp;rsquo;re in the directory containing our data-set. In my system (working off Google Colaboratory connected to a Google Drive back-end), my directory is specified in the PATH variable below.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we list the contents of our directory
+!ls
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;sample_data
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;PATH = &#39;./drive/My Drive/Colab Notebooks/bert-emotion-tweets-tutorial/&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import os
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We change to the directory via the &lt;code&gt;os.chdir()&lt;/code&gt; command&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;os.chdir(PATH)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we check that our current directory has our data-set
+!ls
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Epoch-6.model		     Tutorial-Bert-emotional-analysis.ipynb
+smile-annotations-final.csv
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then import necessary libraries&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import torch #the pytorch library, used for modeling and formatting our data to be compatible in a pytorch environment
+import pandas as pd #for dataframe reading, cleaning functions
+from tqdm.notebook import tqdm #used as a progress bar
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Before reading our data in, let&amp;rsquo;s check what it looks like &amp;ndash; i.e. if it has a header, what its columns are, etc. We do this with a terminal command below&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#inspect first 5 entires
+!head -n 5 smile-annotations-final.csv
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;611857364396965889,&amp;quot;@aandraous @britishmuseum @AndrewsAntonio Merci pour le partage! @openwinemap&amp;quot;,nocode
+614484565059596288,&amp;quot;Dorian Gray with Rainbow Scarf #LoveWins (from @britishmuseum http://t.co/Q4XSwL0esu) http://t.co/h0evbTBWRq&amp;quot;,happy
+614746522043973632,&amp;quot;@SelectShowcase @Tate_StIves ... Replace with your wish which the artist uses in next installation! It was entralling!&amp;quot;,happy
+614877582664835073,&amp;quot;@Sofabsports thank you for following me back. Great to hear from a diverse &amp;amp;amp; interesting panel #DefeatingDepression @RAMMuseum&amp;quot;,happy
+611932373039644672,&amp;quot;@britishmuseum @TudorHistory What a beautiful jewel / portrait. Is the &#39;R&#39; for Rex ?&amp;quot;,happy
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We read the data in, and specify colum names since it doesnt have any. We also index the rows by id.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train = pd.read_csv(&#39;smile-annotations-final.csv&#39;, names=[&#39;id&#39;, &#39;entry&#39;, &#39;emotion&#39;], index_col=&#39;id&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#inspecting the above process
+df_train.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;entry&lt;/th&gt;
+      &lt;th&gt;emotion&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;id&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;611857364396965889&lt;/th&gt;
+      &lt;td&gt;@aandraous @britishmuseum @AndrewsAntonio Merc...&lt;/td&gt;
+      &lt;td&gt;nocode&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614484565059596288&lt;/th&gt;
+      &lt;td&gt;Dorian Gray with Rainbow Scarf #LoveWins (from...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614746522043973632&lt;/th&gt;
+      &lt;td&gt;@SelectShowcase @Tate_StIves ... Replace with ...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614877582664835073&lt;/th&gt;
+      &lt;td&gt;@Sofabsports thank you for following me back. ...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;611932373039644672&lt;/th&gt;
+      &lt;td&gt;@britishmuseum @TudorHistory What a beautiful ...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#inspecting the dimensions of our data
+df_train.shape
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;(3085, 2)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our data-set has 2 columns, one for the actual tweet (i.e. the entry column), and one for the label (i.e. the emotion column). Let&amp;rsquo;s see the different values for emotion our data-set has&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;emotion&#39;].unique()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;array([&#39;nocode&#39;, &#39;happy&#39;, &#39;not-relevant&#39;, &#39;angry&#39;, &#39;disgust|angry&#39;,
+       &#39;disgust&#39;, &#39;happy|surprise&#39;, &#39;sad&#39;, &#39;surprise&#39;, &#39;happy|sad&#39;,
+       &#39;sad|disgust&#39;, &#39;sad|angry&#39;, &#39;sad|disgust|angry&#39;], dtype=object)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We have single emotions, a combination of emotions, and two categories irrelevant for our purposes (i.e. the nocode and not relevant category, where the tweet&amp;rsquo;s emotion category was unclear). We also see that our data-set is highly imbalanced, with some categories having thousands of examples, whilst others (ie.. the disgust category) having less than 10. Our modeling approach must take this imbalance into account later on.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;emotion&#39;].value_counts()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;nocode               1572
+happy                1137
+not-relevant          214
+angry                  57
+surprise               35
+sad                    32
+happy|surprise         11
+happy|sad               9
+disgust|angry           7
+disgust                 6
+sad|angry               2
+sad|disgust             2
+sad|disgust|angry       1
+Name: emotion, dtype: int64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;preprocessing&#34;&gt;Task 3: Pre-processing&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Before fine-tuning BERT onto our data-set, we perform very minimal pre-processing on our tweets. The pre-processing steps we undertake are outlined below. While machine learning methods benefit from a lot of pre-processing, there might be a loss of accuracy with extensive pre-processing prior to modeling with deep learning. This is due to deep learning being very effective at dealing with raw text, and with deep learning models being trained on text collections with a lot of noise/error.&lt;/p&gt;
+&lt;p&gt;More importantly, for us, BERT was trained on Wikipedia (that’s about 2,500 million words) and a book corpus (800 million words). Imaginably, these sources were proof-read and edited and likely use more formal language, low in errors.&lt;/p&gt;
+&lt;p&gt;Since we&amp;rsquo;re fine-tuning on a relatively informal and error-laden data-set of tweets, we pre-process to come as close as possible to the corpus BERT was trained on.&lt;/p&gt;
+&lt;p&gt;We also remove categories that have more than one emotion-label (i.e. &lt;code&gt;happy|surprised&lt;/code&gt;), as that is a multi-label classification problem. We focus on multi-class, single-label classification in this notebook.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;NB: Multi-class refers to more than 2 classes for a target. A target with exclusively 2 classes is termed &amp;lsquo;binary&amp;rsquo; instead. Multi-label refers to having more than 1 label per class&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Our pre-processing steps involve:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Contractions Mapping&lt;/li&gt;
+&lt;li&gt;Punctuation Removal&lt;/li&gt;
+&lt;li&gt;@sign, URL, excess whitespace, HTML tag removal&lt;/li&gt;
+&lt;li&gt;Correcting accented characters&lt;/li&gt;
+&lt;li&gt;Emoji replacement&lt;/li&gt;
+&lt;li&gt;Removal of multi-label categories&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We first have to install the contractions library with:
+&lt;code&gt;!pip install contractions&lt;/code&gt; if we don&amp;rsquo;t have it yet&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Contractions Mapping - we expand out contractions, so words like y&amp;rsquo;all, should&amp;rsquo;ve will be converted to &amp;lsquo;you all&amp;rsquo; and &amp;lsquo;should have&amp;rsquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import contractions 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;contractions.fix(&amp;quot;im hungry and its cold yall&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&#39;I am hungry and its cold you all&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#expanding out contractions
+df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(lambda entry: contractions.fix(entry))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;2.), 3.) and 4.) above are then done as follows, with self explanatory function names. We don&amp;rsquo;t remove &amp;lsquo;!&#39;, &amp;lsquo;?&amp;rsquo; and &amp;lsquo;.&amp;rsquo; completely as these contribute to the tone/meaning of a sentence, but do remove their duplicates.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from bs4 import BeautifulSoup # a library for parsing HTML
+import string
+import unicodedata
+import re
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# remove HTML tags
+def strip_html_tags(text):
+    soup = BeautifulSoup(text, &amp;quot;html.parser&amp;quot;)    
+    return soup.get_text().replace(&amp;quot;\n&amp;quot;, &amp;quot;&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# we then apply the function for removing HTML Tags
+df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(strip_html_tags)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# normalise accented characters i.e. convert à to a
+def remove_accented_chars(text):
+    text = unicodedata.normalize(&#39;NFKD&#39;, text).encode(&#39;ascii&#39;, &#39;ignore&#39;).decode(&#39;utf-8&#39;,&#39;ignore&#39;)
+    return text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(remove_accented_chars)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#remove @name mentions and urls in a tweet
+def remove_mentions_and_urls(text):
+  text = re.sub(&#39;(@[A-Za-z0-9]+)|(\w+:\/\/\S+)|(www.[A-Za-z0-9]+.[A-Za-z0-9]+)&#39;,&#39; &#39;, text)
+  return text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(remove_mentions_and_urls)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#remove punctuations except &#39;?&#39; and &#39;!&#39; and &#39;.&#39;
+def remove_punctuation(text):
+    text = re.sub(r&#39;[\&#39;\&amp;quot;\\\/\,#]&#39;, &#39;&#39;, text)
+    text = re.sub(r&#39;[^\w\s\?\!\.]&#39;, &#39; &#39;, text)
+    return text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(remove_punctuation)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#remove multiple &#39;.&#39;, keep just one
+def remove_excess_fullstops(text):
+  text = re.sub(r&#39;\.{2,}&#39;, &#39;.&#39;, text)
+  return text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(remove_excess_fullstops)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#remove excess and trailing/leading whitespace
+def remove_excess_whitespace(text):
+  text = re.sub(r&#39;\s{2,}&#39;, &#39; &#39;, text).strip()
+  return text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train[&#39;entry&#39;] = df_train[&#39;entry&#39;].apply(remove_excess_whitespace)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We look at 10 pre-processed entries:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train.entry.sample(10)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;id
+615468630256566272                   that is great thank you very much!
+612763483654918144    Gold brooch of Helios or sun god from the work...
+613687848303206400    MT Feast Day of JohntheBaptist. Explore his li...
+613986003922092032    Off to for definingbeauty wanted to go for age...
+611487712521121792    Pick up a copy of the beautiful Catalogue of T...
+613241383470690304    no worries. Good to hear we might see you on 4...
+614964929473421312    They all gazed at him as if he a statue. Plato...
+610505107084570624    Reviewed Leonora Carringtons visit to for here...
+611838280888385536                                  _MADRE e battle sia
+611625177944862721              Ooo we bet this was good ! presentfilms
+Name: entry, dtype: object
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we remove &#39;nocode&#39; and &#39;not relevant&#39; categories, as these don&#39;t indicate emotion
+df_train.drop(df_train[(df_train.emotion == &#39;nocode&#39;) | (df_train.emotion == &#39;not-relevant&#39;)].index, inplace=True)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we remove categories with a &#39;|&#39; in them, our multi-label categories
+df_train.drop(df_train[df_train.emotion.str.contains(&#39;\\|&#39;)].index, inplace=True)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then see below how many examples we have for each emotion category. We confirm that we have a highly imbalanced dataset (i.e. the largest category has 1137 entries, while the smallest has only 6)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train.emotion.value_counts()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;happy       1137
+angry         57
+surprise      35
+sad           32
+disgust        6
+Name: emotion, dtype: int64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;trainvalsplit&#34;&gt;Task 4: Training/Validation Split&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;After pre-processing, our data-set is ready to be split into training and validation data-sets. As our data-set is imbalanced, we&amp;rsquo;ll do &lt;strong&gt;stratified sampling&lt;/strong&gt;. Say we want a split of 85% training and 15% validation data&amp;ndash;this sampling technique ensures that the split happens within each category as opposed to considering all categories as a collective.&lt;/p&gt;
+&lt;p&gt;Without the stratification, we might oversample categories with a large number of examples, and completely exclude categories with a low number of examples (i.e. the disgust category with 6 examples might be left out of training). With the stratification, we split the digust category, for example, 85-15 as well (i.e. 5 training examples, 1 validation example).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#importing modules for splitting the data-set
+from sklearn.model_selection import train_test_split
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#now we create a list of unique emotion labels
+possible_labels = df_train[&#39;emotion&#39;].unique()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;BERT specifically requires that labels passed into it are converted to numbers, hence we do this in the below step.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we convert those labels to numbers, for use in our algorithm later on
+label_dict = {}
+for index, possible_label in enumerate(possible_labels):
+    label_dict[possible_label] = index
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;label_dict
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;{&#39;angry&#39;: 1, &#39;disgust&#39;: 2, &#39;happy&#39;: 0, &#39;sad&#39;: 3, &#39;surprise&#39;: 4}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#We add a new column to our original data-frame, of numbers corresponding to each emotion label
+df_train[&#39;label&#39;] = [label_dict[str_label] for str_label in df_train[&#39;emotion&#39;]]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train.sample(5) 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;entry&lt;/th&gt;
+      &lt;th&gt;emotion&lt;/th&gt;
+      &lt;th&gt;label&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;id&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;615150243592728576&lt;/th&gt;
+      &lt;td&gt;Two very different but equally beautiful events&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;611115939082424321&lt;/th&gt;
+      &lt;td&gt;F is for Funky Fiddle Leaf but also for the fa...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;611980866865242116&lt;/th&gt;
+      &lt;td&gt;Thank you for fascinating talk on art and syna...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;613086766199894016&lt;/th&gt;
+      &lt;td&gt;The Cantabridgia Daili is out! Stories via _Ca...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;615120985738637312&lt;/th&gt;
+      &lt;td&gt;Great Baramundi fish with Clive Loveless. Abor...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;We then split our data into training and validation sets. Validation sets are useful for detecting overfitting in our classifier later on. We set a random state of &lt;code&gt;17&lt;/code&gt; so that anyone who wants to reproduce this notebook can get the exact same results as us.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;x_train, x_val, y_train, y_val = train_test_split(
+    df_train.index.values,
+    df_train[&#39;label&#39;],
+    test_size = 0.20, #let&#39;s do 85-15 train-validation split
+    random_state=17, #reproducible between my instance and whoever wants to reproduce
+    stratify= df_train[&#39;label&#39;].values #the command for stratification
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then check whether the split successfully produced a stratified 85-15 split within each emotion category&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#create a dummy column housing data types - either train/val later on
+df_train[&#39;data_type&#39;] = [&#39;not_set&#39;]*df_train.shape[0]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#if id of sample exists in x_train, make it &#39;train&#39;, otherwise existing in x_val, make it &#39;val&#39;
+df_train.loc[x_train, &#39;data_type&#39;] = &#39;train&#39;
+df_train.loc[x_val, &#39;data_type&#39;] = &#39;val&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#check stratification of training and validation data-sets
+df_train.groupby([&#39;emotion&#39;, &#39;data_type&#39;])[&#39;entry&#39;].count()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;emotion   data_type
+angry     train         45
+          val           12
+disgust   train          5
+          val            1
+happy     train        909
+          val          228
+sad       train         26
+          val            6
+surprise  train         28
+          val            7
+Name: entry, dtype: int64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the stratification worked!&lt;/p&gt;
+&lt;p&gt;Now that we have our training and validation data-sets, we still have to convert them to a format that BERT accepts.&lt;/p&gt;
+&lt;p&gt;There&amp;rsquo;s a lot that&amp;rsquo;s been written on this required format, so we&amp;rsquo;ll just briefly mention them here.&lt;/p&gt;
+&lt;p&gt;In order to fine-tune with the pre-trained BERT model, we need to use its tokeniser. This is because 1.) BERT has a specific, fixed vocabulary and 2.) BERT has a particular way of handling words outside this vocabulary.&lt;/p&gt;
+&lt;p&gt;In addition, we need to add special tokens to the start and end of each sentence, pad and truncate all sentences to a fixed length, and specify which parts of the sentences are padded with an &amp;lsquo;attention mask&amp;rsquo;&lt;/p&gt;
+&lt;p&gt;Luckily, the HuggingFace implementation of BERT has a method we can call on the BERT tokeniser, named &lt;code&gt;encode_plus&lt;/code&gt;, that does all of the above for us.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;encode_plus method&lt;/code&gt; of BERT&amp;rsquo;s tokenizer will:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;split our text into tokens,&lt;/li&gt;
+&lt;li&gt;add the special [CLS] and [SEP] tokens, and&lt;/li&gt;
+&lt;li&gt;convert these tokens into indexes of the tokenizer vocabulary,&lt;/li&gt;
+&lt;li&gt;pad or truncate sentences to a specified max length, and&lt;/li&gt;
+&lt;li&gt;create an attention mask.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1&gt;&lt;a id=&#34;tokenisation&#34;&gt;Task 5: Loading Tokenizer and Encoding our Data&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;We first install the transformers library from HuggingFace to get access to the &lt;code&gt;BERTokenizer&lt;/code&gt; and our eventual &lt;code&gt;BERTForSequenceClassification&lt;/code&gt; model, the one that&amp;rsquo;s fine-tuned for classification tasks. We can do this by running the command:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;!pip install transformers==3.0.0&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;We also import functionality from PyTorch for creating a &lt;code&gt;TensorDataSet&lt;/code&gt;, which is a multi-dimensional tensor data-structure that&amp;rsquo;s used heavily in a PyTorch environment.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from transformers import BertTokenizer
+from torch.utils.data import TensorDataset #setting up our dataset so it&#39;s usable in a pytorch environment
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#set up a tokenizer object, using pre-trained BERT&#39;s own tokenizer
+tokenizer = BertTokenizer.from_pretrained(
+    &#39;bert-base-uncased&#39;, #we ask the tokenizer to lowercase our sentences
+    do_lower_case=True
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;HBox(children=(FloatProgress(value=0.0, description=&#39;Downloading&#39;, max=231508.0, style=ProgressStyle(descripti…
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Recall that we have to pad sentences to a specified length. We first figure out the maximum length of all of our tokenised sentences in the whole data-set via the code block below. We then pass in that max length value to &lt;code&gt;encode_plus&lt;/code&gt;, who will handle padding each sentence to that length for us.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#getting the maximum tokenised length out of tweets in our training data-set
+max_len = 0
+
+# For every sentence...
+for sent in df_train[&#39;entry&#39;]:
+
+    # Tokenize the text and add `[CLS]` and `[SEP]` tokens.
+    input_ids = tokenizer.encode(sent, add_special_tokens=True)
+
+    # Update the maximum sentence length.
+    max_len = max(max_len, len(input_ids))
+
+print(&#39;Max sentence length: &#39;, max_len)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Max sentence length:  36
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#encode our training and validation data-sets with the tokenizer above
+encoded_data_train = tokenizer.batch_encode_plus(
+    #change below to appropriate setup
+    df_train.entry.values,
+    add_special_tokens=True, #add the CLS and SEP tokens
+    truncation=True,
+    return_attention_mask=True, 
+    pad_to_max_length=True,
+    max_length=max_len,
+    return_tensors=&#39;pt&#39; #returns pytorch tensor
+)
+
+encoded_data_val = tokenizer.batch_encode_plus(
+    #change below to appropriate setup
+    df_train[df_train.data_type==&#39;val&#39;].entry.values,
+    add_special_tokens=True, #adds the CLS and SEP tokens
+    truncation=True,
+    return_attention_mask=True,
+    pad_to_max_length=True,
+    max_length=max_len,
+    return_tensors=&#39;pt&#39;
+)
+
+#encoding process above returns dictionaries. We grab input ID tokens, attention mask, and labels from this
+input_ids_train = encoded_data_train[&#39;input_ids&#39;] #return each sentence as a #
+attention_masks_train = encoded_data_train[&#39;attention_mask&#39;] #returns a pytorch tensor
+#change below to appropriate setup, resampled or not
+labels_train = torch.tensor(df_train.label.values)
+
+input_ids_val = encoded_data_val[&#39;input_ids&#39;] #return each sentence as a #
+attention_masks_val = encoded_data_val[&#39;attention_mask&#39;] #returns a pytorch tensor
+labels_val = torch.tensor(df_train[df_train.data_type==&#39;val&#39;].label.values)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we construct a tensor dataset from input ID tokens, attention mask, and labels
+dataset_train = TensorDataset(input_ids_train, 
+                              attention_masks_train, labels_train)
+dataset_validation = TensorDataset(input_ids_val,
+                            attention_masks_val, labels_val)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;BERTsetup&#34;&gt;Task 6: Setting Up BERT Pre-Trained Model&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Now onto our fine-tuning step!&lt;/p&gt;
+&lt;p&gt;The term &amp;lsquo;fine-tuning&amp;rsquo; is generally interchangeable with the term &amp;lsquo;transfer-learning&amp;rsquo;.&lt;/p&gt;
+&lt;p&gt;To perform this step, a deep learning model is &amp;lsquo;chopped off&amp;rsquo; at one of its later layers, with the subsequent layers being replaced by a classifier.&lt;/p&gt;
+&lt;p&gt;The intuition behind fine-tuning, as so eloquently put 
+&lt;a href=&#34;https://www.tensorflow.org/tutorials/images/transfer_learning&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;in this Tensorflow Documentation page&lt;/a&gt;
+ is &amp;lsquo;that if a model is trained on a large and general enough dataset, this model will effectively serve as a generic model of the visual world. You can then take advantage of these learned feature maps without having to start from scratch by training a large model on a large dataset.&amp;rsquo;&lt;/p&gt;
+&lt;p&gt;HuggingFace has implemented a model called &lt;code&gt;BERTForSequenceClassification&lt;/code&gt; that has a sequence classification/regression head on top (i.e. a linear layer on top of the pooled output) of the BERT deep learning model. This is what we&amp;rsquo;ll use for our fine-tuning.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from transformers import BertForSequenceClassification
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We import this model. Below is how we initialise the fine-tuning step. We add another layer on top of it of 6 nodes (i.e. one corresponding to each emotion category).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#each tweet is its own sequence, which will be classified into one of 6 classes
+model = BertForSequenceClassification.from_pretrained(
+    &#39;bert-base-uncased&#39;,  
+    num_labels = len(label_dict),
+    output_attentions = False, #dont need attention mask
+    output_hidden_states = False #last layer before output
+)
+pass
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;HBox(children=(FloatProgress(value=0.0, description=&#39;Downloading&#39;, max=433.0, style=ProgressStyle(description_…
+
+
+
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Downloading&#39;, max=440473133.0, style=ProgressStyle(descri…
+
+
+
+
+
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: [&#39;cls.predictions.bias&#39;, &#39;cls.predictions.transform.dense.weight&#39;, &#39;cls.predictions.transform.dense.bias&#39;, &#39;cls.predictions.decoder.weight&#39;, &#39;cls.seq_relationship.weight&#39;, &#39;cls.seq_relationship.bias&#39;, &#39;cls.predictions.transform.LayerNorm.weight&#39;, &#39;cls.predictions.transform.LayerNorm.bias&#39;]
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPretraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: [&#39;classifier.weight&#39;, &#39;classifier.bias&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;dataloaders&#34;&gt;Task 7: Creating Data Loaders&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;A &lt;code&gt;DataLoader&lt;/code&gt; is an iterable data structure within PyTorch that contains a collection of &lt;code&gt;TensorDataSets&lt;/code&gt;. We iterate through a &lt;code&gt;DataLoader&lt;/code&gt; either sequentially, from the first example to the last, or randomly.&lt;/p&gt;
+&lt;p&gt;The former is a useful format for our validation data-set, as we&amp;rsquo;d want to tie the predictions in our validation data-set back to the original dataframe (and hence we want the ordering to be preserved). The latter is a useful format for our training data-set, as we prevent biasing the training of our mdodel when we randomly sample our batches.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#we import our DataLoader and Samplers
+from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The batch size that we allow per iteration will affect how much compute power is used when fine-tuning on our data. Larger batch-sizes are more suitable for more powerful hardware (i.e. GPUs) whilst smaller batch-sizes are better for CPUs, for example.&lt;/p&gt;
+&lt;p&gt;As we&amp;rsquo;re using a Google Colab GPU, we can use a batch size of 16.&lt;/p&gt;
+&lt;p&gt;The 
+&lt;a href=&#34;https://github.com/google-research/bert&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;BERT Github page/publication&lt;/a&gt;
+ has information on other Batch Sizes and Learning Rates to go with it.&lt;/p&gt;
+&lt;p&gt;If you want to use a GPU yourself, in your Google Colab notebook, navigate to &lt;code&gt;Runtime --&amp;gt; Change Runtime Type --&amp;gt; GPU&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;batch_size = 16
+
+dataloader_train = DataLoader(
+    dataset_train,
+    sampler=RandomSampler(dataset_train), #Randomly train on data, so we don&#39;t bias training
+    batch_size=batch_size
+)
+
+dataloader_val = DataLoader(
+    dataset_validation,
+    sampler=SequentialSampler(dataset_validation), #Sequential sampling on validation data so we can tie results to original dataframe
+    batch_size=batch_size
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;optimise&#34;&gt;Task 8: Setting Up Optimizer and Scheduler&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Optimisers are a set of algorithms responsible for changing attributes of a neural network such as its weights and learning rates in order to reduce loss. They tune hyperparameters per epoch.&lt;/p&gt;
+&lt;p&gt;We use the AdamW optimiser and a learning rate of 1e-5. Again, the BERT paper recommends a set of learning rates and finding the best one for your particular fine-tuning task is a matter of trial and error.&lt;/p&gt;
+&lt;p&gt;In our scheduler, we can specify whether we&amp;rsquo;d want to include warm-up steps, as well as the number of total training steps we&amp;rsquo;re undertaking. Since an epoch is one full pass over the entire training data-set, our value for training steps is the length of a batch * the number of epochs.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from transformers import AdamW, get_linear_schedule_with_warmup
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;optimizer = AdamW(
+    model.parameters(),
+    lr=1e-5, #2e-5 &amp;gt; 5e-5: A HYPERPARAMETER
+    eps=1e-8
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;epochs=6 
+
+scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=0,
+    num_training_steps=len(dataloader_train) * epochs
+)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;performancemetrics&#34;&gt;Task 9: Defining our Performance Metrics&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Prior to our training pass, let&amp;rsquo;s first define useful helper functions to calculate certain metrics like multi-class accuracy and F1 score.&lt;/p&gt;
+&lt;p&gt;We also include a &lt;code&gt;softmax()&lt;/code&gt; function to normalise the predictions generated later, and an &lt;code&gt;emotion_prediction()&lt;/code&gt; function to convert the normalised predictions to an emotion category.&lt;/p&gt;
+&lt;p&gt;The accuracy metric was modified from 
+&lt;a href=&#34;https://mccormickml.com/2019/07/22/BERT-fine-tuning/#41-bertforsequenceclassification&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this tutorial&lt;/a&gt;
+.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np
+from sklearn.metrics import f1_score
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def f1_score_func(preds, labels):
+    &amp;quot;&amp;quot;&amp;quot;
+    Helper function for calculating F1-score between predicted and true values
+    &amp;quot;&amp;quot;&amp;quot;
+    preds_flat = np.argmax(preds, axis=1).flatten() #why flatten? we dont want a list of lists, we just want a single array
+    return f1_score(labels, preds_flat, average=&#39;weighted&#39;)#weights classes according to its distribution. disgust with 6 classes is downweighted
+    #weighted vs macro 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def accuracy_per_class(preds, labels):
+    &amp;quot;&amp;quot;&amp;quot;
+    Helper function for calculating the accuracy per class and displaying it
+    Modified for sentiment Analysis. Not using emotion analysis code
+    &amp;quot;&amp;quot;&amp;quot;
+    preds_flat = np.argmax(preds, axis=1).flatten()
+    
+    for label in np.unique(labels):
+        y_preds = preds_flat[labels==label]
+        y_true = labels[labels==label]
+        print(f&#39;Class: {label_dict_inverse[label]}&#39;)
+        print(f&#39;Accuracy: {len(y_preds[y_preds==label])}/{len(y_true[y_true==label])} in percentage: {len(y_preds[y_preds==label])/len(y_true[y_true==label])}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def softmax(matrix):
+    &amp;quot;&amp;quot;&amp;quot;
+    A function to normalise row values of a matrix to 1.0
+    @param matrix - a numpy matrix which has non-normalised values per row
+    @returns - the matrix with values all normalised to 1.0
+    &amp;quot;&amp;quot;&amp;quot;
+    return (np.exp(matrix.T) / np.sum(np.exp(matrix), axis=1)).T
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def emotion_prediction(normalised_matrix):
+    &amp;quot;&amp;quot;&amp;quot;
+    A function to grab the dominant class (i.e. the prediction)
+    @param normalised_matrix - a numpy matrix, which has normalised values per row, achieved
+    from applying an activation function
+    &amp;quot;&amp;quot;&amp;quot;
+    return np.argmax(normalised_matrix, axis=1).flatten()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We provide a dictionary that maps the raw prediction outputs, which would be numbers, to the emotion categories in words.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;label_dict_inverse = {v:k for (k,v) in label_dict.items()}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;&lt;a id=&#34;trainevalloops&#34;&gt;Task 10: Creating our Training and Evaluation Loops&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;Our Approach for training was adapted from an older version of HuggingFace&amp;rsquo;s &lt;code&gt;run_glue.py&lt;/code&gt; script accessible 
+&lt;a href=&#34;https://github.com/huggingface/transformers/blob/5bfcd0485ece086ebcbed2d008813037968a9e58/examples/run_glue.py#L128&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;
+ and recommended by the HuggingFace team.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#again we set a seed value of 17 to make our training loop reproducible
+
+import random
+
+seed_val = 17 #so our results/process is reproducible by whoever wants to reproduce
+random.seed(seed_val)
+np.random.seed(seed_val)
+torch.manual_seed(seed_val)
+torch.cuda.manual_seed_all(seed_val) #include for when using a GPU
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As PyTorch code is GPU compatible, we have to explicitly specify what device type we&amp;rsquo;re working from.&lt;/p&gt;
+&lt;p&gt;We eventually have to transfer our model and data-structures onto this device type later on.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#to check GPU vs CPU
+device = torch.device(&#39;cuda&#39; if torch.cuda.is_available() else &#39;cpu&#39;)
+model.to(device)
+
+print(device)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;cuda
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then write our code for evaluating the validation data-set in the &lt;code&gt;evaluate()&lt;/code&gt; function below before we write the code for our training data-set. This is because we use &lt;code&gt;evaluate()&lt;/code&gt; in our training loop.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;evaluate()&lt;/code&gt; and our training loop right below it have very similar structures. We point out the differences later on.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#quite similar to training, except for the differences mentioned below
+def evaluate(dataloader_val):
+
+    model.eval()
+    
+    loss_val_total = 0
+    predictions, true_vals = [], []
+    
+    for batch in tqdm(dataloader_val):
+        
+        batch = tuple(b.to(device) for b in batch)
+        
+        inputs = {&#39;input_ids&#39;:      batch[0],
+                  &#39;attention_mask&#39;: batch[1],
+                  &#39;labels&#39;:         batch[2],
+                 }
+        #ignore/disable gradients
+        with torch.no_grad():        
+            outputs = model(**inputs)
+            
+        loss = outputs[0]
+        logits = outputs[1]
+        loss_val_total += loss.item()
+
+        #detach from CPU means pulling values out of GPU to CPU
+        #so we can use numpy, which works only on CPU
+        logits = logits.detach().cpu().numpy()
+        label_ids = inputs[&#39;labels&#39;].cpu().numpy()
+        predictions.append(logits)
+        true_vals.append(label_ids)
+    
+    loss_val_avg = loss_val_total/len(dataloader_val) 
+    
+    predictions = np.concatenate(predictions, axis=0)
+    true_vals = np.concatenate(true_vals, axis=0)
+            
+    return loss_val_avg, predictions, true_vals
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We wrap our training loop below into a &lt;code&gt;tqdm()&lt;/code&gt; object to display a progress bar&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#our training loop!
+for epoch in tqdm(range(1, epochs+1)):
+    model.train()
+    
+    #set to 0 initially, then add each batch&#39;s loss iteratively
+    loss_train_total = 0
+    
+    progress_bar = tqdm(dataloader_train, 
+                        desc=&#39;Epoch {:1d}&#39;.format(epoch),
+                        leave=False, #let it overwrite after each epoch
+                        disable=False, 
+                       )
+    for batch in progress_bar:
+        
+        #first batch = set gradients to 0
+        model.zero_grad()
+        
+        #dataloader has 3 variables. so it&#39;s going to be a tuple of 3 items. We make sure each item is on the correct device
+        batch = tuple(b.to(device) for b in batch)
+        
+        inputs = {
+            &#39;input_ids&#39; : batch[0],
+            &#39;attention_mask&#39; : batch[1],
+            &#39;labels&#39; : batch[2]
+        }
+        
+        #unpacks dictionary straight into model
+        outputs = model(**inputs)
+        
+        #bert model returns loss and logits
+        loss = outputs[0]
+        loss_train_total += loss.item() #add up loss
+        loss.backward() #backpropagate
+        
+        #all weights will be a norm of 1 (normalised weights)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        
+        optimizer.step()
+        scheduler.step()
+        
+        #update progress bar to display loss per batch
+        progress_bar.set_postfix({&#39;training_loss&#39; : &#39;{:3f}&#39;.format(loss.item()/len(batch))})
+        
+    #outside the batch loop and inside the epoch loop, so per epoch
+    #save model checkpoint and print progress
+    torch.save(model.state_dict(), f&#39;Epoch-{epoch}.model&#39;)
+    
+    tqdm.write(f&#39;\nEpoch {epoch}&#39;)
+    
+    loss_train_avg = loss_train_total/len(dataloader_train)
+    #loss per epoch:
+    tqdm.write(f&#39;Training loss: {loss_train_avg}&#39;)
+    
+    #to detect overtraining - happens when training loss goes down and val loss goes up. Starts to
+    #train perfectly on our data such that its no longer generalisable
+    val_loss, predictions, true_vals = evaluate(dataloader_val) #predictions are the logits
+
+    val_f1 = f1_score_func(predictions, true_vals)
+    tqdm.write(f&#39;Validation loss: {val_loss}&#39;)
+    tqdm.write(f&#39;F1 Score (weighted): {val_f1}&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;HBox(children=(FloatProgress(value=0.0, max=6.0), HTML(value=&#39;&#39;)))
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Epoch 1&#39;, max=159.0, style=ProgressStyle(description_widt…
+
+
+
+Epoch 1
+Training loss: 0.5584828776524127
+
+
+
+HBox(children=(FloatProgress(value=0.0, max=32.0), HTML(value=&#39;&#39;)))
+
+
+
+Validation loss: 0.2766137867583893
+F1 Score (weighted): 0.8965437215084957
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Epoch 2&#39;, max=159.0, style=ProgressStyle(description_widt…
+
+
+
+Epoch 2
+Training loss: 0.24347842407980994
+
+
+
+HBox(children=(FloatProgress(value=0.0, max=32.0), HTML(value=&#39;&#39;)))
+
+
+
+Validation loss: 0.1528040450939443
+F1 Score (weighted): 0.9427103377445136
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Epoch 3&#39;, max=159.0, style=ProgressStyle(description_widt…
+
+
+
+Epoch 3
+Training loss: 0.1628657704359799
+
+
+
+HBox(children=(FloatProgress(value=0.0, max=32.0), HTML(value=&#39;&#39;)))
+
+
+
+Validation loss: 0.07538615397061221
+F1 Score (weighted): 0.9586534476712678
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Epoch 4&#39;, max=159.0, style=ProgressStyle(description_widt…
+
+
+
+Epoch 4
+Training loss: 0.10585488408142056
+
+
+
+HBox(children=(FloatProgress(value=0.0, max=32.0), HTML(value=&#39;&#39;)))
+
+
+
+Validation loss: 0.06744529563729884
+F1 Score (weighted): 0.9632545931758529
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Epoch 5&#39;, max=159.0, style=ProgressStyle(description_widt…
+
+
+
+Epoch 5
+Training loss: 0.08138270038853651
+
+
+
+HBox(children=(FloatProgress(value=0.0, max=32.0), HTML(value=&#39;&#39;)))
+
+
+
+Validation loss: 0.048784602870000526
+F1 Score (weighted): 0.9769995855781185
+
+
+
+HBox(children=(FloatProgress(value=0.0, description=&#39;Epoch 6&#39;, max=159.0, style=ProgressStyle(description_widt…
+
+
+
+Epoch 6
+Training loss: 0.0737762286301421
+
+
+
+HBox(children=(FloatProgress(value=0.0, max=32.0), HTML(value=&#39;&#39;)))
+
+
+
+Validation loss: 0.04574976687581511
+F1 Score (weighted): 0.9864752200092636
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What our training loop has that our &lt;code&gt;evaluate()&lt;/code&gt; function doesn&amp;rsquo;t have:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The ability to backpropagate&lt;/li&gt;
+&lt;li&gt;The ability to monitor training and validation loss per epoch&lt;/li&gt;
+&lt;li&gt;The ability to save a trained model as a checkpoint&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;&lt;a id=&#34;evaluatemodel&#34;&gt;Task 11: Loading and Evaluating our Model&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;During training, we have saved our trained model parameters with a &lt;code&gt;.model&lt;/code&gt; extension in our current directory.&lt;/p&gt;
+&lt;p&gt;The 6th Epoch of training lead to the highest weighted macro F1 score of &lt;strong&gt;0.986&lt;/strong&gt;! The training and validation losses in this epoch were 0.07 and 0.05, respectively.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;This is a STAGGERING result&lt;/strong&gt;, and highlights the power of transfer learning models.&lt;/p&gt;
+&lt;p&gt;As the training and validation losses are similar in magnitude and our validation loss hasn&amp;rsquo;t plateaued, we don&amp;rsquo;t seem to have overfit our model to the training data! Yay!&lt;/p&gt;
+&lt;p&gt;Now let&amp;rsquo;s load a fresh BERT Model, load our 6th Epoch model checkpoints onto it, evaluate our validation data-set again with &lt;code&gt;evaluate()&lt;/code&gt; then look closer at accuracies. We ignore the messages it generates.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#fresh model
+model = BertForSequenceClassification.from_pretrained(&amp;quot;bert-base-uncased&amp;quot;,
+                                                      num_labels=len(label_dict),
+                                                      output_attentions=False,
+                                                      output_hidden_states=False)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: [&#39;cls.predictions.bias&#39;, &#39;cls.predictions.transform.dense.weight&#39;, &#39;cls.predictions.transform.dense.bias&#39;, &#39;cls.predictions.decoder.weight&#39;, &#39;cls.seq_relationship.weight&#39;, &#39;cls.seq_relationship.bias&#39;, &#39;cls.predictions.transform.LayerNorm.weight&#39;, &#39;cls.predictions.transform.LayerNorm.bias&#39;]
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPretraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: [&#39;classifier.weight&#39;, &#39;classifier.bias&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#pass on the fresh model to the correct device, either GPU or CPU
+model.to(device)
+pass #so we dont have all that text printed out
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;# cuda indicates a GPU is available. Replace with &#39;cpu&#39; when using a cpu.
+model.load_state_dict(
+    torch.load(&#39;Epoch-6.model&#39;,
+              map_location=torch.device(&#39;cuda&#39;)))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;All keys matched successfully&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#grabbing predictions from validation data-set
+_, predictions_val, labels_val = evaluate(dataloader_val)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;HBox(children=(FloatProgress(value=0.0, max=16.0), HTML(value=&#39;&#39;)))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;evaluate()&lt;/code&gt; generated a matrix of predictions for the validation data-set of with the dimensions below: 254 rows, each corresponding to a tweet in the validation data-set and 5 columns, each corresponding to an emotion category.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;predictions_val.shape
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;(254, 5)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#looking at the fifth example in the predictions matrix
+predictions_val[4]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;array([ 6.018326 , -1.8091979, -2.1678815, -1.2804692, -2.0098157],
+      dtype=float32)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Looking at the fifth example in the prediction matrix, we see that the values for each of the 5 columns aren&amp;rsquo;t normalised to 1.0. Let&amp;rsquo;s normalise it with an activation function, 
+&lt;a href=&#34;http://rasbt.github.io/mlxtend/user_guide/classifier/SoftmaxRegression/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;the softmax&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The results of this normalisation for each category is the probability that the sentence belongs to that category.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#grab predictions variable here and do a softmax, to visualise results against df
+percent_emotions_val = softmax(predictions_val)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As we see below, the fifth example&amp;rsquo;s most probable category is the first column (whatever it is). The probability that it belongs to the category represented by this column is 99%!&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;percent_emotions_val[4]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;array([9.9832332e-01, 3.9794299e-04, 2.7800113e-04, 6.7521929e-04,
+       3.2560693e-04], dtype=float32)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then determine the actual emotion category by running it through one final function, which takes the softmax-ed predictions matrix and grabs the most probable emotion label:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#from soft-maxed probabilities of emotions to picking the most dominant emotion
+emotions_val = emotion_prediction(percent_emotions_val)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The output is naturally a number (as we trained it with numbers!), so we pass in the inverse dictionary that maps the number to its string category. We see that the first tweet was predicted as a happy one:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;label_dict_inverse[emotions_val[4]]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&#39;happy&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df_train
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;entry&lt;/th&gt;
+      &lt;th&gt;emotion&lt;/th&gt;
+      &lt;th&gt;label&lt;/th&gt;
+      &lt;th&gt;data_type&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;id&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614484565059596288&lt;/th&gt;
+      &lt;td&gt;Dorian Gray with Rainbow Scarf LoveWins from&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;val&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614746522043973632&lt;/th&gt;
+      &lt;td&gt;_StIves . Replace with your wish which the art...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;val&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614877582664835073&lt;/th&gt;
+      &lt;td&gt;thank you for following me back. Great to hear...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;611932373039644672&lt;/th&gt;
+      &lt;td&gt;What a beautiful jewel portrait. Is the R for ...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;611570404268883969&lt;/th&gt;
+      &lt;td&gt;I have always loved this painting.&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;...&lt;/th&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+      &lt;td&gt;...&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;614053885733412864&lt;/th&gt;
+      &lt;td&gt;Good to see s art collection Thx to _StIves _r...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;610405281604993024&lt;/th&gt;
+      &lt;td&gt;thanks we will have a look next week after Fri...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;612214539468279808&lt;/th&gt;
+      &lt;td&gt;Thanks for ranking us 1 in things to do in Lon...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;613678555935973376&lt;/th&gt;
+      &lt;td&gt;MT Looking forward to our public engagement ev...&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;615246897670922240&lt;/th&gt;
+      &lt;td&gt;Mesmerising.&lt;/td&gt;
+      &lt;td&gt;happy&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;train&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;1267 rows × 4 columns&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Let&amp;rsquo;s have a look at the actual tweet and it&amp;rsquo;s actual label though:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;print(f&amp;quot;Tweet: {df_train[df_train.data_type==&#39;val&#39;].iloc[4,0]}\noriginal label: {df_train[df_train.data_type==&#39;val&#39;].iloc[4,1]}\npredicted label: {label_dict_inverse[emotions_val[4]]}&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Tweet: Wonderful experience hearing Tim Knoxs objects2015 keynote on contents decor of UK country houses in gallery 3 of _UK!
+original label: happy
+predicted label: happy
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&amp;rsquo;s do the above process for all tweets in our validation data-set, and officially calculate accuracy metrics for each emotion category&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#calculating accuracy per class
+print(&#39;Accuracy per class of val dataset:\n&#39;)
+accuracy_per_class(predictions_val, labels_val)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Accuracy per class of val dataset:
+
+Class: happy
+Accuracy: 228/228 in percentage: 1.0
+Class: angry
+Accuracy: 12/12 in percentage: 1.0
+Class: disgust
+Accuracy: 0/1 in percentage: 0.0
+Class: sad
+Accuracy: 4/6 in percentage: 0.6666666666666666
+Class: surprise
+Accuracy: 7/7 in percentage: 1.0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see above that the model performed badly for the disgust category, miss-classifying the only disgust entry in the validation data-set as something else. The rest of the categories were predicted accurately, with stunning accuracy scores ranging from 60% to 100%!&lt;/p&gt;
+&lt;p&gt;We then look at the macro-weighted F1 score over our entire validation data-set. This should match the output of our training loop above (i.e. Epoch 6&amp;rsquo;s validation data loss should be 0.98)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#f1 score overall
+print(&#39;Weighted F1 score of val dataset:&#39;)
+print(f1_score_func(predictions_val, labels_val))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Weighted F1 score of val dataset:
+0.9864752200092636
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Overall, a very pleasing result :)&lt;/p&gt;
+&lt;p&gt;As we saw, we achieved highly accurate results leveraging the knowledge of generalist BERT for our specialist task of classifying emotions in tweets. We fine-tuned on a single GPU in less than 30 minutes to achieve 98.6% accuracy, a very impressive feat that&amp;rsquo;s impossible without transformers!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Closing Remarks:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;If we wanted to improve the accuracy of the sad/disgust categories, we can consider resampling categories so the numbers of all categories are more balanced&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The following links helped greatly in building this notebook:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://jalammar.github.io/illustrated-bert/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jay Alammar&amp;rsquo;s illustration-based explanation of the BERT architecture&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://jalammar.github.io/a-visual-guide-to-using-bert-for-the-first-time/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jay Alammar&amp;rsquo;s visual exploration of BERT embeddings&lt;/a&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;http://mccormickml.com/2019/07/22/BERT-fine-tuning/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Chris McCormick&amp;rsquo;s BERT-Fine Tuning with PyTorch&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Stay tuned for further posts on how I use BERT for topic modeling, building a chatbot, and deploying a BERT model onto the cloud!&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Web Scraping</title>
       <link>https://nixramirez.github.io/project/data-scraping/</link>
       <pubDate>Thu, 27 Feb 2020 00:00:00 +0000</pubDate>
@@ -199,13 +1335,13 @@ for pageno in range(1,lastPageNo):
     time.sleep(1.5)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;h4 id=&#34;3-we-parse-the-html-of-each-search-result-pageand-scrape&#34;&gt;3. We parse the HTML of each search result page&amp;hellip;and SCRAPE!&lt;/h4&gt;
-&lt;p&gt;&amp;hellip;Using Beautifulsoup. The &lt;em&gt;page_source&lt;/em&gt; attribute of the driver grabs the page with its corresponding HTML tags, and parses it with &lt;em&gt;lxml&lt;/em&gt;, which as mentioned above, allows us to query the results using xpath if we wished.&lt;/p&gt;
+&lt;p&gt;&amp;hellip;Using Beautifulsoup. The &lt;em&gt;page_source&lt;/em&gt; attribute of the driver grabs the page with its corresponding HTML tags, and parses it with &lt;strong&gt;lxml&lt;/strong&gt;, which as mentioned above, allows us to query the results using xpath if we wished.&lt;/p&gt;
 &lt;p&gt;After parsing, we then grab specific HTML content. We do this by:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Inspecting the html tags where our information lies, by using Google Chrome&amp;rsquo;s &lt;em&gt;inspect&lt;/em&gt; option&lt;/li&gt;
 &lt;li&gt;Collecting information that would distinguish our target HTML tag/s from others&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; with class &lt;em&gt;&amp;ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&amp;rdquo;&lt;/em&gt;. To grab each salary block from a page, we then use BeautifulSoup&amp;rsquo;s findAll() method, passing on the &lt;code&gt;&amp;lt;div class=&amp;quot;&amp;quot;&amp;gt;&lt;/code&gt; information mentioned.&lt;/p&gt;
+&lt;p&gt;Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a &lt;code&gt;&amp;lt;div&amp;gt;&lt;/code&gt; with class &lt;strong&gt;&amp;ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&amp;rdquo;&lt;/strong&gt;. To grab each salary block from a page, we then use BeautifulSoup&amp;rsquo;s findAll() method, passing on the &lt;code&gt;&amp;lt;div class=&amp;quot;&amp;quot;&amp;gt;&lt;/code&gt; information mentioned.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;salaryBlocks.png&#34; alt=&#34;salary blocks enclosed in divs&#34;&gt;&lt;/p&gt;
 &lt;p&gt;We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
 These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.&lt;/p&gt;
