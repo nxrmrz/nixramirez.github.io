@@ -95,6 +95,259 @@
     </item>
     
     <item>
+      <title>Assessing Classification Models</title>
+      <link>https://nixramirez.github.io/project/classifier-diagnostics/</link>
+      <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/classifier-diagnostics/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;Metrics to assess models on&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In this post, I provide code to calculate the classification metrics below.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Accuracy - What proportion of sentences were correctly classified (i.e. as positive, negative, neutral)?&lt;/li&gt;
+&lt;li&gt;Precision - Answers the q: What proportion of &lt;em&gt;predicted&lt;/em&gt; positives were actual positives?&lt;/li&gt;
+&lt;li&gt;Recall - Answers the q: What proportion of &lt;em&gt;actual&lt;/em&gt; positives were predicted positive?&lt;/li&gt;
+&lt;li&gt;F1 Score - The harmonic mean of a classifier&amp;rsquo;s precision/recall scores&lt;/li&gt;
+&lt;li&gt;Confusion Matrix - A 2D matrix showing the predicted and actual counts of a target category&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In a second iteration of this blog post, we&amp;rsquo;ll add in code to calculate an additional two metrics below.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ROC curve - Shows how changing the classification threshold changes the True Positive Rate and False Positive Rate&lt;/li&gt;
+&lt;li&gt;AUC - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+&lt;a href=&#34;.roc-curve-v2.png&#34;&gt;ROC-AUC curves&lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;The choice of what metric to assess for your specific classifier depends on your question. If you&amp;rsquo;re classifying who has diabetes from a patient pool, for example, you&amp;rsquo;d want recall to be high. If you&amp;rsquo;re recommending movies to a user, you&amp;rsquo;d want the user to like the movies you recommended, so you&amp;rsquo;d want precision to be high. Overall, with a balanced data-set, we&amp;rsquo;d want accuracy to be high. With an un-balanced data-set, we&amp;rsquo;d want the weighted F1-score to be high.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#first we import necessary packages
+from sklearn import metrics
+import pandas as pd
+import os
+import numpy as np
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After training a classifier to generate predictions, we apply the diagnostic metrics above, often comparing predictions to the true labels.&lt;/p&gt;
+&lt;p&gt;In the data-frame below, we have a column housing true labels (i.e. &lt;code&gt;sentiment&lt;/code&gt;), and one housing predictions (i.e. &lt;code&gt;predictions&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#insert the data-set you&#39;d want to read
+df = pd.read_csv(&#39;predictions_starship_albert_epoch10.csv&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;sentiment_to_categories_dict = {
+    2: &#39;positive&#39;,
+    1: &#39;neutral&#39;,
+    0: &#39;negative&#39;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df.sentiment = df.sentiment.apply(lambda sentiment: sentiment_to_categories_dict[sentiment])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;Unnamed: 0&lt;/th&gt;
+      &lt;th&gt;entry&lt;/th&gt;
+      &lt;th&gt;sentiment&lt;/th&gt;
+      &lt;th&gt;predictions&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;Up early ferry to Rangitoto walked up snack at...&lt;/td&gt;
+      &lt;td&gt;positive&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;P home on time. Nap then food shop girls over ...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;negative&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;Morning nap did not get up until late shower t...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;N. Slept well but tired. Busy board at start b...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;N. Slept well woken by post. Slow but steady n...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;We store the predictions and true labels on separate vectors&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#True values (actual)
+y_true = df[&#39;sentiment&#39;]
+
+#predicted values (from model output)
+y_pred = df[&#39;predictions&#39;]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then create row and column labels to append to our confusion matrix later on&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#get row and column labels for confusion matrix
+
+#get unique row labels
+row_labels = np.unique(y_true)
+
+#get column labels
+column_labels = [label + &amp;quot;_predicted&amp;quot; for label in row_labels]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here we create a confusion matrix, passing in the row and column labels we create above&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#create a confusion matrix object and display it (with labels)
+c_m = pd.DataFrame(metrics.confusion_matrix(y_true,y_pred), index=row_labels, columns=column_labels)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We display the confusion matrix:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;c_m
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;negative_predicted&lt;/th&gt;
+      &lt;th&gt;neutral_predicted&lt;/th&gt;
+      &lt;th&gt;positive_predicted&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;negative&lt;/th&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;26&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;neutral&lt;/th&gt;
+      &lt;td&gt;12&lt;/td&gt;
+      &lt;td&gt;40&lt;/td&gt;
+      &lt;td&gt;10&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;positive&lt;/th&gt;
+      &lt;td&gt;8&lt;/td&gt;
+      &lt;td&gt;21&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;&amp;hellip;as a data-frame:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#display all diagnostics as a data-frame, save results to a variable too
+confusion_matrix = pd.DataFrame(metrics.classification_report(y_true,y_pred, digits=3, output_dict=True))
+confusion_matrix
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;negative&lt;/th&gt;
+      &lt;th&gt;neutral&lt;/th&gt;
+      &lt;th&gt;positive&lt;/th&gt;
+      &lt;th&gt;accuracy&lt;/th&gt;
+      &lt;th&gt;macro avg&lt;/th&gt;
+      &lt;th&gt;weighted avg&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;precision&lt;/th&gt;
+      &lt;td&gt;0.230769&lt;/td&gt;
+      &lt;td&gt;0.459770&lt;/td&gt;
+      &lt;td&gt;0.133333&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;0.274624&lt;/td&gt;
+      &lt;td&gt;0.318094&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;recall&lt;/th&gt;
+      &lt;td&gt;0.171429&lt;/td&gt;
+      &lt;td&gt;0.645161&lt;/td&gt;
+      &lt;td&gt;0.064516&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;0.293702&lt;/td&gt;
+      &lt;td&gt;0.375000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;f1-score&lt;/th&gt;
+      &lt;td&gt;0.196721&lt;/td&gt;
+      &lt;td&gt;0.536913&lt;/td&gt;
+      &lt;td&gt;0.086957&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;0.273530&lt;/td&gt;
+      &lt;td&gt;0.334918&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;support&lt;/th&gt;
+      &lt;td&gt;35.000000&lt;/td&gt;
+      &lt;td&gt;62.000000&lt;/td&gt;
+      &lt;td&gt;31.000000&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;128.000000&lt;/td&gt;
+      &lt;td&gt;128.000000&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;We can save the confusion matrix results to a file, for later indexing/reporting.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#save results to a file
+confusion_matrix.to_csv(&#39;fileName.csv&#39;, index=True)
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Detecting Seasons in React.js</title>
       <link>https://nixramirez.github.io/project/reactfirstproj/</link>
       <pubDate>Sat, 02 May 2020 00:00:00 +0000</pubDate>
