@@ -5,7 +5,7 @@
     <link>https://nixramirez.github.io/tags/</link>
       <atom:link href="https://nixramirez.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sat, 02 May 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 25 Aug 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Tags</title>
@@ -13,18 +13,18 @@
     </image>
     
     <item>
-      <title>Programming</title>
-      <link>https://nixramirez.github.io/tags/programming/</link>
-      <pubDate>Sat, 02 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://nixramirez.github.io/tags/programming/</guid>
+      <title>Data Projects</title>
+      <link>https://nixramirez.github.io/tags/data-projects/</link>
+      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/tags/data-projects/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Data Projects</title>
-      <link>https://nixramirez.github.io/tags/data-projects/</link>
-      <pubDate>Wed, 15 Apr 2020 00:00:00 +0000</pubDate>
-      <guid>https://nixramirez.github.io/tags/data-projects/</guid>
+      <title>Programming</title>
+      <link>https://nixramirez.github.io/tags/programming/</link>
+      <pubDate>Sat, 02 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/tags/programming/</guid>
       <description></description>
     </item>
     

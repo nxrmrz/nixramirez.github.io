@@ -79,6 +79,22 @@
     </item>
     
     <item>
+      <title>Intro to Data Visualisation Workshop</title>
+      <link>https://nixramirez.github.io/project/intro-to-data-visualisation/</link>
+      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/intro-to-data-visualisation/</guid>
+      <description>&lt;p&gt;For the second semester of 2020, I had the privilege of teaching another workshop for the Data Science Club, this time covering Data Visualisation packages Matplotlib and Seaborn in Python.&lt;/p&gt;
+&lt;p&gt;I co-taught the workshop with a fellow club executive member, Saahil, also another Data Science Master&amp;rsquo;s student from the University.&lt;/p&gt;
+&lt;p&gt;In the workshop, we work through a data-set and explain syntax and customisation options for univariate (i.e. single variable) and multivariate (i.e. more than 1 variable) plotting tasks.&lt;/p&gt;
+&lt;h2 id=&#34;watch-on-below&#34;&gt;Watch on below!&lt;/h2&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/E7XWgVBNzHA&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;strong&gt;The materials accompanying the workshop can be 
+&lt;a href=&#34;https://drive.google.com/drive/folders/1qe5NwgELEvr4JrFwuZAiAAVS2rabnISp?usp=sharing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;downloaded from here&lt;/a&gt;
+&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Detecting Seasons in React.js</title>
       <link>https://nixramirez.github.io/project/reactfirstproj/</link>
       <pubDate>Sat, 02 May 2020 00:00:00 +0000</pubDate>
