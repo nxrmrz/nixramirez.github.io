@@ -99,8 +99,9 @@
       <link>https://nixramirez.github.io/project/classifier-diagnostics/</link>
       <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
       <guid>https://nixramirez.github.io/project/classifier-diagnostics/</guid>
-      <description>&lt;p&gt;&lt;strong&gt;Metrics to assess models on&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;In this post, I provide code to calculate the classification metrics below.&lt;/p&gt;
+      <description>&lt;p&gt;&lt;strong&gt;TL;DR:&lt;/strong&gt; In applied machine learning, models are often optimised for their accuracy in predicting a target. When the target is quantitative, measures like the R^2 value and the Root Mean Squared Error (RMSE) etc., help in quantifying this accuracy. When the target is qualitative, metrics like Accuracy, Precision, Recall and several others are used. We term these measures &amp;lsquo;classification metrics&amp;rsquo; for the sake of this blog post.&lt;/p&gt;
+&lt;p&gt;In this post, I provide code to calculate these metrics and produce a report including them that can be easily saved to a file for later use.&lt;/p&gt;
+&lt;p&gt;The metrics are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Accuracy - What proportion of sentences were correctly classified (i.e. as positive, negative, neutral)?&lt;/li&gt;
 &lt;li&gt;Precision - Answers the q: What proportion of &lt;em&gt;predicted&lt;/em&gt; positives were actual positives?&lt;/li&gt;
@@ -113,9 +114,7 @@
 &lt;li&gt;ROC curve - Shows how changing the classification threshold changes the True Positive Rate and False Positive Rate&lt;/li&gt;
 &lt;li&gt;AUC - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;
-&lt;a href=&#34;.roc-curve-v2.png&#34;&gt;ROC-AUC curves&lt;/a&gt;
-&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;roc-curve-v2.png&#34; alt=&#34;ROC-AUC curves&#34;&gt;&lt;/p&gt;
 &lt;p&gt;The choice of what metric to assess for your specific classifier depends on your question. If you&amp;rsquo;re classifying who has diabetes from a patient pool, for example, you&amp;rsquo;d want recall to be high. If you&amp;rsquo;re recommending movies to a user, you&amp;rsquo;d want the user to like the movies you recommended, so you&amp;rsquo;d want precision to be high. Overall, with a balanced data-set, we&amp;rsquo;d want accuracy to be high. With an un-balanced data-set, we&amp;rsquo;d want the weighted F1-score to be high.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#first we import necessary packages
 from sklearn import metrics
@@ -269,7 +268,7 @@ c_m = pd.DataFrame(metrics.confusion_matrix(y_true,y_pred), index=row_labels, co
   &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;p&gt;&amp;hellip;as a data-frame:&lt;/p&gt;
+&lt;p&gt;&amp;hellip;as a data-frame&amp;hellip;with all of the other metrics mentioned above:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#display all diagnostics as a data-frame, save results to a variable too
 confusion_matrix = pd.DataFrame(metrics.classification_report(y_true,y_pred, digits=3, output_dict=True))
 confusion_matrix
@@ -340,7 +339,7 @@ confusion_matrix
   &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
-&lt;p&gt;We can save the confusion matrix results to a file, for later indexing/reporting.&lt;/p&gt;
+&lt;p&gt;We can save this full classification report to a file, for later indexing/reporting.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#save results to a file
 confusion_matrix.to_csv(&#39;fileName.csv&#39;, index=True)
 &lt;/code&gt;&lt;/pre&gt;

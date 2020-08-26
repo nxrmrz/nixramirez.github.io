@@ -587,8 +587,9 @@
   <div class="article-container">
 
     <div class="article-style">
-      <p><strong>Metrics to assess models on</strong></p>
-<p>In this post, I provide code to calculate the classification metrics below.</p>
+      <p><strong>TL;DR:</strong> In applied machine learning, models are often optimised for their accuracy in predicting a target. When the target is quantitative, measures like the R^2 value and the Root Mean Squared Error (RMSE) etc., help in quantifying this accuracy. When the target is qualitative, metrics like Accuracy, Precision, Recall and several others are used. We term these measures &lsquo;classification metrics&rsquo; for the sake of this blog post.</p>
+<p>In this post, I provide code to calculate these metrics and produce a report including them that can be easily saved to a file for later use.</p>
+<p>The metrics are:</p>
 <ul>
 <li>Accuracy - What proportion of sentences were correctly classified (i.e. as positive, negative, neutral)?</li>
 <li>Precision - Answers the q: What proportion of <em>predicted</em> positives were actual positives?</li>
@@ -601,9 +602,7 @@
 <li>ROC curve - Shows how changing the classification threshold changes the True Positive Rate and False Positive Rate</li>
 <li>AUC - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)</li>
 </ul>
-<p>
-<a href=".roc-curve-v2.png">ROC-AUC curves</a>
-</p>
+<p><img src="roc-curve-v2.png" alt="ROC-AUC curves"></p>
 <p>The choice of what metric to assess for your specific classifier depends on your question. If you&rsquo;re classifying who has diabetes from a patient pool, for example, you&rsquo;d want recall to be high. If you&rsquo;re recommending movies to a user, you&rsquo;d want the user to like the movies you recommended, so you&rsquo;d want precision to be high. Overall, with a balanced data-set, we&rsquo;d want accuracy to be high. With an un-balanced data-set, we&rsquo;d want the weighted F1-score to be high.</p>
 <pre><code class="language-python">#first we import necessary packages
 from sklearn import metrics
@@ -757,7 +756,7 @@ c_m = pd.DataFrame(metrics.confusion_matrix(y_true,y_pred), index=row_labels, co
   </tbody>
 </table>
 </div>
-<p>&hellip;as a data-frame:</p>
+<p>&hellip;as a data-frame&hellip;with all of the other metrics mentioned above:</p>
 <pre><code class="language-python">#display all diagnostics as a data-frame, save results to a variable too
 confusion_matrix = pd.DataFrame(metrics.classification_report(y_true,y_pred, digits=3, output_dict=True))
 confusion_matrix
@@ -828,7 +827,7 @@ confusion_matrix
   </tbody>
 </table>
 </div>
-<p>We can save the confusion matrix results to a file, for later indexing/reporting.</p>
+<p>We can save this full classification report to a file, for later indexing/reporting.</p>
 <pre><code class="language-python">#save results to a file
 confusion_matrix.to_csv('fileName.csv', index=True)
 </code></pre>
