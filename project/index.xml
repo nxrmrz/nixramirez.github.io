@@ -1184,7 +1184,7 @@ print(f1_score_func(predictions_val, labels_val))
 &lt;li&gt;&lt;strong&gt;Recall/Sensitivity&lt;/strong&gt; - Answers the q: What proportion of &lt;em&gt;actual&lt;/em&gt; positives were predicted positive?&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;F-1 Score&lt;/strong&gt; - The harmonic mean of a classifier&amp;rsquo;s precision and recall scores&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Generally, when someone mentions the last 3 metrics above, without a prefix, they mean them to be the &lt;em&gt;macro-precision&lt;/em&gt;, &lt;em&gt;macro-recall&lt;/em&gt;, and &lt;em&gt;macro-F1&lt;/em&gt;, These metrics come in two other flavours however, the micro- and the weighted. Let&amp;rsquo;s take the example of the precision score (but the exact same descriptions can be said for recall and the F-1 score). Whilst the macro precision is simply the average of the precision scores calculated for each class, the weighted precision weights this score by the number of examples of that class before averaging across classes. This is why macro precision is a better metric for balanced data-sets weighted precision is better for imbalanced ones. Micro precision is more involved than both, and is explained later on.&lt;/p&gt;
+&lt;p&gt;Generally, when someone mentions the last 3 metrics above, without a prefix, they mean them to be the &lt;em&gt;macro-precision&lt;/em&gt;, &lt;em&gt;macro-recall&lt;/em&gt;, and &lt;em&gt;macro-F1&lt;/em&gt;. These metrics come in two other flavours however, the micro- and the weighted. Let&amp;rsquo;s take the example of the precision score (but the exact same descriptions can be said for recall and the F-1 score). Whilst the macro precision is simply the average of the precision scores calculated for each class, the weighted precision weights this score by the number of examples of that class before averaging across classes. This is why macro precision is a better metric for balanced data-sets while weighted precision is better for imbalanced ones. Micro precision is more involved than both, and is explained later on.&lt;/p&gt;
 &lt;p&gt;The above metrics can be calculated from a &lt;strong&gt;confusion matrix&lt;/strong&gt; which is a 2D matrix showing the predicted and actual counts of a target category, therefore showing the distribution of True Positives (TPs), False Positives (FPs), True Negatives (TNs), and False Negatives (FNs) in your data.&lt;/p&gt;
 &lt;p&gt;As we see in Section 1.1 below, the equations of the above metrics require knowledge of the TP/FPs and TN/FNs. Calculating the above metrics by hand therefore requires a confusion matrix to be made beforehand.&lt;/p&gt;
 &lt;h4 id=&#34;section-11-diving-deeper-into-the-metrics&#34;&gt;Section 1.1: Diving Deeper into the Metrics&lt;/h4&gt;
@@ -1225,24 +1225,29 @@ $$&lt;/p&gt;
 &lt;h4 id=&#34;section-13-the-rocauc-scores&#34;&gt;Section 1.3: The ROC/AUC scores&lt;/h4&gt;
 &lt;p&gt;In a later blog post, we&amp;rsquo;ll explore two additional metrics briefly described below, as they are derived simultaneously while training a machine learning model.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;ROC curve - Shows how changing the classification threshold changes the True Positive Rate and False Positive Rate. The classification threshold can be visually represented best by the diagram below:&lt;/li&gt;
-&lt;li&gt;AUC - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ROC curve&lt;/strong&gt; - Shows how changing the 
+&lt;a href=&#34;https://developers.google.com/machine-learning/crash-course/classification/thresholding&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;classification threshold&lt;/a&gt;
+ changes the True Positive Rate and False Positive Rate. In a binary classification problem, the classification threshold is a probability value that delineates between two classes, and is a hyperparameter we have to optimise for. Why is it a probability value? Well that&amp;rsquo;s because classifiers return probability values before we associate a category to those values based on our interpretation of them! Say, for one image classified by our Dog vs. Cat image classifier above, the resulting probabilities are 0.95 that it&amp;rsquo;s a dog and 0.05 that it&amp;rsquo;s a cat. The image is &lt;strong&gt;likely&lt;/strong&gt; a dog&amp;hellip;but what if we had a second image where the probability of it being a dog was 0.6? The &lt;strong&gt;classification threshold&lt;/strong&gt; we set determines what class this second image belongs to, and if we set it to be 0.6, then our image &lt;em&gt;just barely made it to the threshold of being a dog image&lt;/em&gt;. Probabilities below 0.6 will classify it as a cat. You can see how changing this threshold might change the number of TPs/FPs and TNs/FNs in our data. See the image below for a visual depiction of this curve.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AUC&lt;/strong&gt; - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;img src=&#34;roc-curve-v2.png&#34; alt=&#34;ROC-AUC curves&#34;&gt;&lt;/p&gt;
 &lt;h4 id=&#34;what-metric-do-we-choose-to-evaluate-our-classifier-by&#34;&gt;What metric do we choose to evaluate our classifier by?&lt;/h4&gt;
 &lt;p&gt;It ultimately depends on your research question. If you&amp;rsquo;re classifying who has diabetes from a patient pool, for example, you&amp;rsquo;d want recall to be high. If you&amp;rsquo;re recommending movies to a user, you&amp;rsquo;d want the user to like the movies you recommended, so you&amp;rsquo;d want precision to be high. Overall, with a balanced data-set, you&amp;rsquo;d want accuracy to be high. With an un-balanced data-set, you&amp;rsquo;d want the weighted F1-score to be high.&lt;/p&gt;
 &lt;h3 id=&#34;section-2-code&#34;&gt;Section 2: Code&lt;/h3&gt;
+&lt;p&gt;In this section, we write some code to generate the metrics above.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#first we import necessary packages
 from sklearn import metrics
 import pandas as pd
 import os
 import numpy as np
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;After training a classifier to generate predictions, we apply the diagnostic metrics above, often comparing predictions to the true labels.&lt;/p&gt;
-&lt;p&gt;In the data-frame below, we have a column housing true labels (i.e. &lt;code&gt;sentiment&lt;/code&gt;), and one housing predictions (i.e. &lt;code&gt;predictions&lt;/code&gt;)&lt;/p&gt;
+&lt;p&gt;After training a classifier to generate predictions, we compare predictions to true labels and apply the metrics above.&lt;/p&gt;
+&lt;p&gt;Below, we read in a file containing predictions and true labels for a sentiment classification problem (i.e. classifying the sentiment of text entries as either positive, negative or neutral). This is a multi-class problem, as we have more than 2 classes to predict.&lt;/p&gt;
+&lt;p&gt;In the resulting data-frame, we have a column housing true labels (i.e. &lt;code&gt;sentiment&lt;/code&gt;), and one housing predictions (i.e. &lt;code&gt;predictions&lt;/code&gt;)&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#insert the data-set you&#39;d want to read
-df = pd.read_csv(&#39;predictions_starship_albert_epoch10.csv&#39;)
+df = pd.read_csv(&#39;predictions.csv&#39;)
 &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We convert numerical labels generated by our classifier to categorical labels for ease of interpretation.&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;sentiment_to_categories_dict = {
     2: &#39;positive&#39;,
     1: &#39;neutral&#39;,
