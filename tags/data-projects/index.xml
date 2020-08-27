@@ -13,274 +13,6 @@
     </image>
     
     <item>
-      <title>Intro to Data Visualisation Workshop</title>
-      <link>https://nixramirez.github.io/project/intro-to-data-visualisation/</link>
-      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
-      <guid>https://nixramirez.github.io/project/intro-to-data-visualisation/</guid>
-      <description>&lt;p&gt;For the second semester of 2020, I had the privilege of teaching another workshop for the Data Science Club, this time covering Data Visualisation packages Matplotlib and Seaborn in Python.&lt;/p&gt;
-&lt;p&gt;I co-taught the workshop with a fellow club executive member, Saahil, also another Data Science Master&amp;rsquo;s student from the University.&lt;/p&gt;
-&lt;p&gt;In the workshop, we work through a data-set and explain syntax and customisation options for univariate (i.e. single variable) and multivariate (i.e. more than 1 variable) plotting tasks.&lt;/p&gt;
-&lt;h2 id=&#34;watch-on-below&#34;&gt;Watch on below!&lt;/h2&gt;
-&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/E7XWgVBNzHA&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;p&gt;&lt;strong&gt;The materials accompanying the workshop can be 
-&lt;a href=&#34;https://drive.google.com/drive/folders/1qe5NwgELEvr4JrFwuZAiAAVS2rabnISp?usp=sharing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;downloaded from here&lt;/a&gt;
-&lt;/strong&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Assessing Classification Models</title>
-      <link>https://nixramirez.github.io/project/classifier-diagnostics/</link>
-      <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
-      <guid>https://nixramirez.github.io/project/classifier-diagnostics/</guid>
-      <description>&lt;p&gt;&lt;strong&gt;TL;DR:&lt;/strong&gt; In applied machine learning, models are often optimised for their accuracy in predicting a target. When the target is quantitative, measures like the R^2 value and the Root Mean Squared Error (RMSE) etc., help in quantifying this accuracy. When the target is qualitative, metrics like Accuracy, Precision, Recall and several others are used. We term these measures &amp;lsquo;classification metrics&amp;rsquo; for the sake of this blog post.&lt;/p&gt;
-&lt;p&gt;In this post, I provide code to calculate these metrics and produce a report including them that can be easily saved to a file for later use.&lt;/p&gt;
-&lt;p&gt;The metrics are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Accuracy - What proportion of sentences were correctly classified (i.e. as positive, negative, neutral)?&lt;/li&gt;
-&lt;li&gt;Precision - Answers the q: What proportion of &lt;em&gt;predicted&lt;/em&gt; positives were actual positives?&lt;/li&gt;
-&lt;li&gt;Recall - Answers the q: What proportion of &lt;em&gt;actual&lt;/em&gt; positives were predicted positive?&lt;/li&gt;
-&lt;li&gt;F1 Score - The harmonic mean of a classifier&amp;rsquo;s precision/recall scores&lt;/li&gt;
-&lt;li&gt;Confusion Matrix - A 2D matrix showing the predicted and actual counts of a target category&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;In a second iteration of this blog post, we&amp;rsquo;ll add in code to calculate an additional two metrics below.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;ROC curve - Shows how changing the classification threshold changes the True Positive Rate and False Positive Rate&lt;/li&gt;
-&lt;li&gt;AUC - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;roc-curve-v2.png&#34; alt=&#34;ROC-AUC curves&#34;&gt;&lt;/p&gt;
-&lt;p&gt;The choice of what metric to assess for your specific classifier depends on your question. If you&amp;rsquo;re classifying who has diabetes from a patient pool, for example, you&amp;rsquo;d want recall to be high. If you&amp;rsquo;re recommending movies to a user, you&amp;rsquo;d want the user to like the movies you recommended, so you&amp;rsquo;d want precision to be high. Overall, with a balanced data-set, we&amp;rsquo;d want accuracy to be high. With an un-balanced data-set, we&amp;rsquo;d want the weighted F1-score to be high.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#first we import necessary packages
-from sklearn import metrics
-import pandas as pd
-import os
-import numpy as np
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;After training a classifier to generate predictions, we apply the diagnostic metrics above, often comparing predictions to the true labels.&lt;/p&gt;
-&lt;p&gt;In the data-frame below, we have a column housing true labels (i.e. &lt;code&gt;sentiment&lt;/code&gt;), and one housing predictions (i.e. &lt;code&gt;predictions&lt;/code&gt;)&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#insert the data-set you&#39;d want to read
-df = pd.read_csv(&#39;predictions_starship_albert_epoch10.csv&#39;)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;sentiment_to_categories_dict = {
-    2: &#39;positive&#39;,
-    1: &#39;neutral&#39;,
-    0: &#39;negative&#39;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df.sentiment = df.sentiment.apply(lambda sentiment: sentiment_to_categories_dict[sentiment])
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df.head()
-&lt;/code&gt;&lt;/pre&gt;
-&lt;div&gt;
-&lt;style scoped&gt;
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
-    vertical-align: top;
-}
-
-.dataframe thead th {
-    text-align: right;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
-&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
-  &lt;thead&gt;
-    &lt;tr style=&#34;text-align: right;&#34;&gt;
-      &lt;th&gt;&lt;/th&gt;
-      &lt;th&gt;Unnamed: 0&lt;/th&gt;
-      &lt;th&gt;entry&lt;/th&gt;
-      &lt;th&gt;sentiment&lt;/th&gt;
-      &lt;th&gt;predictions&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;th&gt;0&lt;/th&gt;
-      &lt;td&gt;0&lt;/td&gt;
-      &lt;td&gt;Up early ferry to Rangitoto walked up snack at...&lt;/td&gt;
-      &lt;td&gt;positive&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;1&lt;/th&gt;
-      &lt;td&gt;1&lt;/td&gt;
-      &lt;td&gt;P home on time. Nap then food shop girls over ...&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-      &lt;td&gt;negative&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;2&lt;/th&gt;
-      &lt;td&gt;2&lt;/td&gt;
-      &lt;td&gt;Morning nap did not get up until late shower t...&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;3&lt;/th&gt;
-      &lt;td&gt;3&lt;/td&gt;
-      &lt;td&gt;N. Slept well but tired. Busy board at start b...&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;4&lt;/th&gt;
-      &lt;td&gt;4&lt;/td&gt;
-      &lt;td&gt;N. Slept well woken by post. Slow but steady n...&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-      &lt;td&gt;neutral&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;p&gt;We store the predictions and true labels on separate vectors&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#True values (actual)
-y_true = df[&#39;sentiment&#39;]
-
-#predicted values (from model output)
-y_pred = df[&#39;predictions&#39;]
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We then create row and column labels to append to our confusion matrix later on&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#get row and column labels for confusion matrix
-
-#get unique row labels
-row_labels = np.unique(y_true)
-
-#get column labels
-column_labels = [label + &amp;quot;_predicted&amp;quot; for label in row_labels]
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Here we create a confusion matrix, passing in the row and column labels we create above&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#create a confusion matrix object and display it (with labels)
-c_m = pd.DataFrame(metrics.confusion_matrix(y_true,y_pred), index=row_labels, columns=column_labels)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We display the confusion matrix:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;c_m
-&lt;/code&gt;&lt;/pre&gt;
-&lt;div&gt;
-&lt;style scoped&gt;
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
-    vertical-align: top;
-}
-
-.dataframe thead th {
-    text-align: right;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
-&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
-  &lt;thead&gt;
-    &lt;tr style=&#34;text-align: right;&#34;&gt;
-      &lt;th&gt;&lt;/th&gt;
-      &lt;th&gt;negative_predicted&lt;/th&gt;
-      &lt;th&gt;neutral_predicted&lt;/th&gt;
-      &lt;th&gt;positive_predicted&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;th&gt;negative&lt;/th&gt;
-      &lt;td&gt;6&lt;/td&gt;
-      &lt;td&gt;26&lt;/td&gt;
-      &lt;td&gt;3&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;neutral&lt;/th&gt;
-      &lt;td&gt;12&lt;/td&gt;
-      &lt;td&gt;40&lt;/td&gt;
-      &lt;td&gt;10&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;positive&lt;/th&gt;
-      &lt;td&gt;8&lt;/td&gt;
-      &lt;td&gt;21&lt;/td&gt;
-      &lt;td&gt;2&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;p&gt;&amp;hellip;as a data-frame&amp;hellip;with all of the other metrics mentioned above:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#display all diagnostics as a data-frame, save results to a variable too
-confusion_matrix = pd.DataFrame(metrics.classification_report(y_true,y_pred, digits=3, output_dict=True))
-confusion_matrix
-&lt;/code&gt;&lt;/pre&gt;
-&lt;div&gt;
-&lt;style scoped&gt;
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
-    vertical-align: top;
-}
-
-.dataframe thead th {
-    text-align: right;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
-&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
-  &lt;thead&gt;
-    &lt;tr style=&#34;text-align: right;&#34;&gt;
-      &lt;th&gt;&lt;/th&gt;
-      &lt;th&gt;negative&lt;/th&gt;
-      &lt;th&gt;neutral&lt;/th&gt;
-      &lt;th&gt;positive&lt;/th&gt;
-      &lt;th&gt;accuracy&lt;/th&gt;
-      &lt;th&gt;macro avg&lt;/th&gt;
-      &lt;th&gt;weighted avg&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;th&gt;precision&lt;/th&gt;
-      &lt;td&gt;0.230769&lt;/td&gt;
-      &lt;td&gt;0.459770&lt;/td&gt;
-      &lt;td&gt;0.133333&lt;/td&gt;
-      &lt;td&gt;0.375&lt;/td&gt;
-      &lt;td&gt;0.274624&lt;/td&gt;
-      &lt;td&gt;0.318094&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;recall&lt;/th&gt;
-      &lt;td&gt;0.171429&lt;/td&gt;
-      &lt;td&gt;0.645161&lt;/td&gt;
-      &lt;td&gt;0.064516&lt;/td&gt;
-      &lt;td&gt;0.375&lt;/td&gt;
-      &lt;td&gt;0.293702&lt;/td&gt;
-      &lt;td&gt;0.375000&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;f1-score&lt;/th&gt;
-      &lt;td&gt;0.196721&lt;/td&gt;
-      &lt;td&gt;0.536913&lt;/td&gt;
-      &lt;td&gt;0.086957&lt;/td&gt;
-      &lt;td&gt;0.375&lt;/td&gt;
-      &lt;td&gt;0.273530&lt;/td&gt;
-      &lt;td&gt;0.334918&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;th&gt;support&lt;/th&gt;
-      &lt;td&gt;35.000000&lt;/td&gt;
-      &lt;td&gt;62.000000&lt;/td&gt;
-      &lt;td&gt;31.000000&lt;/td&gt;
-      &lt;td&gt;0.375&lt;/td&gt;
-      &lt;td&gt;128.000000&lt;/td&gt;
-      &lt;td&gt;128.000000&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;p&gt;We can save this full classification report to a file, for later indexing/reporting.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#save results to a file
-confusion_matrix.to_csv(&#39;fileName.csv&#39;, index=True)
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
       <title>Multi-Class Emotion Classification with Deep Learning using BERT</title>
       <link>https://nixramirez.github.io/project/bert-emotion-classification/</link>
       <pubDate>Wed, 15 Apr 2020 00:00:00 +0000</pubDate>
@@ -1413,6 +1145,321 @@ print(f1_score_func(predictions_val, labels_val))
 &lt;p&gt;Stay tuned for further posts on how I use BERT for topic modeling, building a chatbot, and deploying a BERT model onto the cloud!&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Intro to Data Visualisation Workshop</title>
+      <link>https://nixramirez.github.io/project/intro-to-data-visualisation/</link>
+      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/intro-to-data-visualisation/</guid>
+      <description>&lt;p&gt;For the second semester of 2020, I had the privilege of teaching another workshop for the Data Science Club, this time covering Data Visualisation packages Matplotlib and Seaborn in Python.&lt;/p&gt;
+&lt;p&gt;I co-taught the workshop with a fellow club executive member, Saahil, also another Data Science Master&amp;rsquo;s student from the University.&lt;/p&gt;
+&lt;p&gt;In the workshop, we work through a data-set and explain syntax and customisation options for univariate (i.e. single variable) and multivariate (i.e. more than 1 variable) plotting tasks.&lt;/p&gt;
+&lt;h2 id=&#34;watch-on-below&#34;&gt;Watch on below!&lt;/h2&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/E7XWgVBNzHA&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;strong&gt;The materials accompanying the workshop can be 
+&lt;a href=&#34;https://drive.google.com/drive/folders/1qe5NwgELEvr4JrFwuZAiAAVS2rabnISp?usp=sharing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;downloaded from here&lt;/a&gt;
+&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Assessing Classification Models</title>
+      <link>https://nixramirez.github.io/project/classifier-diagnostics/</link>
+      <pubDate>Mon, 08 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://nixramirez.github.io/project/classifier-diagnostics/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;TL;DR:&lt;/strong&gt; In applied machine learning, models are often optimised for their accuracy in predicting a target. When the target is quantitative, measures like the R^2 value and the Root Mean Squared Error (RMSE) etc., help in quantifying this accuracy. When the target is qualitative, metrics like Accuracy, Precision, Recall and several others are used. We term these measures &amp;lsquo;classification metrics&amp;rsquo; for the sake of this blog post.&lt;/p&gt;
+&lt;p&gt;In this post, I explain classification metrics and provide python code to calculate them. I also produce a report including them that can be easily saved to a file for later use.&lt;/p&gt;
+&lt;p&gt;Say you&amp;rsquo;ve run your data through a classifier, and the classifier has predicted labels for your data. To judge how accurate those predictions are, you can evaluate them by the metrics explained below&lt;/p&gt;
+&lt;h3 id=&#34;section-1-classification-metrics&#34;&gt;Section 1: Classification Metrics&lt;/h3&gt;
+&lt;p&gt;The metrics covered by this post is as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Accuracy&lt;/strong&gt; - What proportion of sentences were correctly classified (i.e. as positive, negative, neutral)?&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Precision&lt;/strong&gt; - Answers the q: What proportion of &lt;em&gt;predicted&lt;/em&gt; positives were actual positives? The polar opposite for this is specificity:
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Specificity&lt;/strong&gt; - Answers the q: What proportion of &lt;em&gt;predicted&lt;/em&gt; negatives were actual negatives?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Recall/Sensitivity&lt;/strong&gt; - Answers the q: What proportion of &lt;em&gt;actual&lt;/em&gt; positives were predicted positive?&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;F-1 Score&lt;/strong&gt; - The harmonic mean of a classifier&amp;rsquo;s precision and recall scores&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Generally, when someone mentions the last 3 metrics above, without a prefix, they mean them to be the &lt;em&gt;macro-precision&lt;/em&gt;, &lt;em&gt;macro-recall&lt;/em&gt;, and &lt;em&gt;macro-F1&lt;/em&gt;, These metrics come in two other flavours however, the micro- and the weighted. Let&amp;rsquo;s take the example of the precision score (but the exact same descriptions can be said for recall and the F-1 score). Whilst the macro precision is simply the average of the precision scores calculated for each class, the weighted precision weights this score by the number of examples of that class before averaging across classes. This is why macro precision is a better metric for balanced data-sets weighted precision is better for imbalanced ones. Micro precision is more involved than both, and is explained later on.&lt;/p&gt;
+&lt;p&gt;The above metrics can be calculated from a &lt;strong&gt;confusion matrix&lt;/strong&gt; which is a 2D matrix showing the predicted and actual counts of a target category, therefore showing the distribution of True Positives (TPs), False Positives (FPs), True Negatives (TNs), and False Negatives (FNs) in your data.&lt;/p&gt;
+&lt;p&gt;As we see in Section 1.1 below, the equations of the above metrics require knowledge of the TP/FPs and TN/FNs. Calculating the above metrics by hand therefore requires a confusion matrix to be made beforehand.&lt;/p&gt;
+&lt;h4 id=&#34;section-11-diving-deeper-into-the-metrics&#34;&gt;Section 1.1: Diving Deeper into the Metrics&lt;/h4&gt;
+&lt;p&gt;Let&amp;rsquo;s display a confusion matrix for a binary classification (i.e. 2 classes for the target) problem to intuitively get a grasp of its contents.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;CM1.png&#34; alt=&#34;Confusion Matrix&#34;&gt;&lt;/p&gt;
+&lt;p&gt;The goal for a classifier is to increase TP/TNs while reducing misclassification, or the number of FP/FNs&lt;/p&gt;
+&lt;p&gt;Knowing the above, our metrics can be represented as the following equations:
+$$
+Accuracy = \frac{TP + TN}{FP + FN + TP + TN}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+Precision = \frac{TP}{TP + FP}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+Recall = \frac{TP}{TP + FN}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+F_1= \frac{2}{\frac{1}{Precision} \times \frac{1}{Recall}} = 2 \times \frac{Recall \times Precision}{Recall + Precision}
+$$&lt;/p&gt;
+&lt;h4 id=&#34;section-12-diving-deeper-into-various-flavours-of-precision&#34;&gt;Section 1.2: Diving Deeper into various flavours of Precision&lt;/h4&gt;
+&lt;p&gt;Shown above is the equation for the precision score of &lt;strong&gt;one class&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The macro and weighted precision scores for a binary classification (i.e. with 2 classes) can be represented as:&lt;/p&gt;
+&lt;p&gt;$$
+Macro Precision= \frac{Precision_{class1} + Precision_{class2}}{2}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+Weighted Precision= \frac{(Precision_{class1} \times c_1) + (Precision_{class2} \times c_2)}{c_1 + c_2}
+$$&lt;/p&gt;
+&lt;p&gt;where $c_1$ and $c_2$ are the number of examples in classes $1$ and $2$&lt;/p&gt;
+&lt;p&gt;Note that if we replace &lt;code&gt;Precision&lt;/code&gt; above with &lt;code&gt;F-1 score&lt;/code&gt; or &lt;code&gt;Recall&lt;/code&gt;, the formulas would still work!&lt;/p&gt;
+&lt;p&gt;To calculate micro precision, instead of taking measurements of precision &lt;strong&gt;for each class&lt;/strong&gt; (i.e. taking TPs and FPs for each class), we compute TPs and FPs out of the &lt;strong&gt;total pool&lt;/strong&gt; of examples.&lt;/p&gt;
+&lt;p&gt;Take the confusion matrix below for another binary classification problem, classifying photos of a cat or a dog.
+&lt;img src=&#34;confusion_matrix.png&#34; alt=&#34;confusion matrix 2&#34;&gt;&lt;/p&gt;
+&lt;p&gt;We calculate the TP and FP out of the total number of examples as follows:
+&lt;img src=&#34;TP+FP.png&#34; alt=&#34;TP+FP&#34;&gt;&lt;/p&gt;
+&lt;p&gt;And therefore our micro precision is:
+&lt;img src=&#34;microprecision.png&#34; alt=&#34;microprecision&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;section-13-the-rocauc-scores&#34;&gt;Section 1.3: The ROC/AUC scores&lt;/h4&gt;
+&lt;p&gt;In a later blog post, we&amp;rsquo;ll explore two additional metrics briefly described below, as they are derived simultaneously while training a machine learning model.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ROC curve - Shows how changing the classification threshold changes the True Positive Rate and False Positive Rate. The classification threshold can be visually represented best by the diagram below:&lt;/li&gt;
+&lt;li&gt;AUC - The area under the ROC curve. A high AUC value, associated with a ROC curve occupying the upper left quadrant is ideal and indicates a good classifier (i.e. because its True Positive Rate is high, whilst its False Positive Rate is low)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;roc-curve-v2.png&#34; alt=&#34;ROC-AUC curves&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;what-metric-do-we-choose-to-evaluate-our-classifier-by&#34;&gt;What metric do we choose to evaluate our classifier by?&lt;/h4&gt;
+&lt;p&gt;It ultimately depends on your research question. If you&amp;rsquo;re classifying who has diabetes from a patient pool, for example, you&amp;rsquo;d want recall to be high. If you&amp;rsquo;re recommending movies to a user, you&amp;rsquo;d want the user to like the movies you recommended, so you&amp;rsquo;d want precision to be high. Overall, with a balanced data-set, you&amp;rsquo;d want accuracy to be high. With an un-balanced data-set, you&amp;rsquo;d want the weighted F1-score to be high.&lt;/p&gt;
+&lt;h3 id=&#34;section-2-code&#34;&gt;Section 2: Code&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#first we import necessary packages
+from sklearn import metrics
+import pandas as pd
+import os
+import numpy as np
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After training a classifier to generate predictions, we apply the diagnostic metrics above, often comparing predictions to the true labels.&lt;/p&gt;
+&lt;p&gt;In the data-frame below, we have a column housing true labels (i.e. &lt;code&gt;sentiment&lt;/code&gt;), and one housing predictions (i.e. &lt;code&gt;predictions&lt;/code&gt;)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#insert the data-set you&#39;d want to read
+df = pd.read_csv(&#39;predictions_starship_albert_epoch10.csv&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;sentiment_to_categories_dict = {
+    2: &#39;positive&#39;,
+    1: &#39;neutral&#39;,
+    0: &#39;negative&#39;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df.sentiment = df.sentiment.apply(lambda sentiment: sentiment_to_categories_dict[sentiment])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;df.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;Unnamed: 0&lt;/th&gt;
+      &lt;th&gt;entry&lt;/th&gt;
+      &lt;th&gt;sentiment&lt;/th&gt;
+      &lt;th&gt;predictions&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;Up early ferry to Rangitoto walked up snack at...&lt;/td&gt;
+      &lt;td&gt;positive&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;P home on time. Nap then food shop girls over ...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;negative&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;Morning nap did not get up until late shower t...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;N. Slept well but tired. Busy board at start b...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;N. Slept well woken by post. Slow but steady n...&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+      &lt;td&gt;neutral&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;We store the predictions and true labels on separate vectors&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#True values (actual)
+y_true = df[&#39;sentiment&#39;]
+
+#predicted values (from model output)
+y_pred = df[&#39;predictions&#39;]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We then create row and column labels to append to our confusion matrix later on&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#get row and column labels for confusion matrix
+
+#get unique row labels
+row_labels = np.unique(y_true)
+
+#get column labels
+column_labels = [label + &amp;quot;_predicted&amp;quot; for label in row_labels]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here we create a confusion matrix, passing in the row and column labels we create above&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#create a confusion matrix object and display it (with labels)
+c_m = pd.DataFrame(metrics.confusion_matrix(y_true,y_pred), index=row_labels, columns=column_labels)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We display the confusion matrix:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;c_m
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;negative_predicted&lt;/th&gt;
+      &lt;th&gt;neutral_predicted&lt;/th&gt;
+      &lt;th&gt;positive_predicted&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;negative&lt;/th&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;26&lt;/td&gt;
+      &lt;td&gt;3&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;neutral&lt;/th&gt;
+      &lt;td&gt;12&lt;/td&gt;
+      &lt;td&gt;40&lt;/td&gt;
+      &lt;td&gt;10&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;positive&lt;/th&gt;
+      &lt;td&gt;8&lt;/td&gt;
+      &lt;td&gt;21&lt;/td&gt;
+      &lt;td&gt;2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;&amp;hellip;as a data-frame&amp;hellip;with all of the other metrics mentioned above:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#display all diagnostics as a data-frame, save results to a variable too
+confusion_matrix = pd.DataFrame(metrics.classification_report(y_true,y_pred, digits=3, output_dict=True))
+confusion_matrix
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;negative&lt;/th&gt;
+      &lt;th&gt;neutral&lt;/th&gt;
+      &lt;th&gt;positive&lt;/th&gt;
+      &lt;th&gt;accuracy&lt;/th&gt;
+      &lt;th&gt;macro avg&lt;/th&gt;
+      &lt;th&gt;weighted avg&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;precision&lt;/th&gt;
+      &lt;td&gt;0.230769&lt;/td&gt;
+      &lt;td&gt;0.459770&lt;/td&gt;
+      &lt;td&gt;0.133333&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;0.274624&lt;/td&gt;
+      &lt;td&gt;0.318094&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;recall&lt;/th&gt;
+      &lt;td&gt;0.171429&lt;/td&gt;
+      &lt;td&gt;0.645161&lt;/td&gt;
+      &lt;td&gt;0.064516&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;0.293702&lt;/td&gt;
+      &lt;td&gt;0.375000&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;f1-score&lt;/th&gt;
+      &lt;td&gt;0.196721&lt;/td&gt;
+      &lt;td&gt;0.536913&lt;/td&gt;
+      &lt;td&gt;0.086957&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;0.273530&lt;/td&gt;
+      &lt;td&gt;0.334918&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;support&lt;/th&gt;
+      &lt;td&gt;35.000000&lt;/td&gt;
+      &lt;td&gt;62.000000&lt;/td&gt;
+      &lt;td&gt;31.000000&lt;/td&gt;
+      &lt;td&gt;0.375&lt;/td&gt;
+      &lt;td&gt;128.000000&lt;/td&gt;
+      &lt;td&gt;128.000000&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Notice&lt;/strong&gt; that another metric called &lt;code&gt;support&lt;/code&gt; is included in the classification report. Support is simply the number of examples for each class.&lt;/p&gt;
+&lt;p&gt;We can save this full classification report to a file, for later indexing/reporting.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#save results to a file
+confusion_matrix.to_csv(&#39;fileName.csv&#39;, index=True)
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

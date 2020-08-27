@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://nixramirez.github.io/project/bert-emotion-classification/</loc>
+    <lastmod>2020-04-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://nixramirez.github.io/courses/example/example1/</loc>
     <lastmod>2019-05-05T00:00:00+01:00</lastmod>
   </url>
@@ -70,11 +75,6 @@
   <url>
     <loc>https://nixramirez.github.io/project/pythonworkshop/</loc>
     <lastmod>2020-04-17T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://nixramirez.github.io/project/bert-emotion-classification/</loc>
-    <lastmod>2020-04-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
