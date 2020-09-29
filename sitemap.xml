@@ -23,6 +23,10 @@
   </url>
   
   <url>
+    <loc>https://nixramirez.github.io/project/batch-inference-aws-deployment/</loc>
+  </url>
+  
+  <url>
     <loc>https://nixramirez.github.io/talk/example/</loc>
     <lastmod>2030-06-01T13:00:00+00:00</lastmod>
   </url>
@@ -204,10 +208,6 @@
   
   <url>
     <loc>https://nixramirez.github.io/courses/</loc>
-  </url>
-  
-  <url>
-    <loc>https://nixramirez.github.io/project/batch-inference-aws-deployment/</loc>
   </url>
   
 </urlset>

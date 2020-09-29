@@ -28,7 +28,7 @@
   
     
   
-  <meta name="description" content="I deploy a deep learning model trained for sentiment analysis outside of AWS in an AWS managed Docker container">
+  <meta name="description" content="Deploying a PyTorch model trained externally for sentiment analysis in an AWS managed Docker container">
 
   
   <link rel="alternate" hreflang="en-us" href="https://nixramirez.github.io/project/batch-inference-aws-deployment/">
@@ -233,7 +233,7 @@
   <meta property="og:site_name" content="Hello, World">
   <meta property="og:url" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/">
   <meta property="og:title" content="Deploying a deep learning model in AWS | Hello, World">
-  <meta property="og:description" content="I deploy a deep learning model trained for sentiment analysis outside of AWS in an AWS managed Docker container"><meta property="og:image" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/featured.jpg">
+  <meta property="og:description" content="Deploying a PyTorch model trained externally for sentiment analysis in an AWS managed Docker container"><meta property="og:image" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/featured.jpg">
   <meta property="twitter:image" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/featured.jpg"><meta property="og:locale" content="en-us">
   
     
@@ -285,7 +285,7 @@
       "url": "img/https://nixramirez.github.io/"
     }
   },
-  "description": "I deploy a deep learning model trained for sentiment analysis outside of AWS in an AWS managed Docker container"
+  "description": "Deploying a PyTorch model trained externally for sentiment analysis in an AWS managed Docker container"
 }
 </script>
 
@@ -588,116 +588,9 @@
   <div class="article-container">
 
     <div class="article-style">
-      <p>If you&rsquo;re a data professional working with machine learning models in the cloud, then you might be familiar with Amazon Web Services&rsquo; (AWS) SageMaker. 
-<a href="https://aws.amazon.com/sagemaker/" target="_blank" rel="noopener">SageMaker</a>
- is AWS&rsquo; machine learning platform allowing developers to build, train, and deploy models in the cloud or in embedded systems and edge devices.</p>
-<p>There are a dizzying number of services available within SageMaker for all kinds of machine learning use-cases. For the sake of brevity in this post, we will only cover a specific use-case&ndash;that of bringing into AWS, and eventually deploying a deep learning model <strong>trained outside</strong> of the AWS ecosystem. We&rsquo;d also want the deployed model to perform predictions for a <strong>batch</strong> of data (i.e. multiple rows), as opposed to a single entry. Also, we&rsquo;d want the model to predict in <strong>serverless</strong> fashion, meaning we only invoke the model and the hardware powering it <strong>when we&rsquo;re doing predictions</strong>. Serverless is <em>pay-as-you-go</em>. The opposite of serverless would be to make the model&rsquo;s hardware <em>persist</em>, even when not actively predicting.</p>
-<p>In this post, we compare and contrast services relevant to our use-case and show how we deployed a deep learning model, trained outside AWS, for batch inference. You&rsquo;ll hopefully learn how model deployment in SageMaker works and get an overview of other SageMaker features.</p>
-<p>So let&rsquo;s dive right in!</p>
-<h3 id="the-sagemaker-platform">The SageMaker Platform</h3>
-<p>To help make sense of the various features SageMaker has, AWS offers a <em>fantastic</em> 
-<a href="">technical deep dive</a>
- on the platform, which I&rsquo;d highly recommend you browse before reading SageMaker documentation.</p>
-<p>SageMaker also has a 
-<a href="">2 month free tier</a>
- for hands-on tinkering with the platform, perfect for exploring what it offers!</p>
-<h4 id="notebooks-and-s3">Notebooks and S3</h4>
-<p>Central to SageMaker are 
-<a href="">Notebook Instances</a>
-, Jupyter Notebook environments running on EC2 instances that are fully managed by AWS upon creation. While the <em>fully managed</em> keyword implies that we can do very little altering of the EC2 instance&rsquo;s system save from some non-persistent shell commands, it also means we can use it out-of-the-box for running common data science packages.</p>
-<p>A Jupyter notebook inside an instance can hold code for reading data in, pre-processing it, using it to train a model, validating the model, and deploying it later. While we can think of a notebook as the front-end for our interactions with SageMaker, we can think of an S3 storage bucket as our back-end. Our notebook instance has to be connected to an S3 bucket to read data from or save/load model artefacts to/from.</p>
-<p><strong>NB:</strong> When we deploy a model trained in a notebook, we are not deploying the notebook itself. We&rsquo;re just using the notebook to <em>orchestrate</em> training, validation and deployment.</p>
-<p>We don&rsquo;t cover configuring Notebook Instances and S3 buckets here as there are a lot of tutorials on these subjects. Just make sure that the S3 bucket exists in the same region as the Notebook Instance for them to connect, and that going for the smallest compute hardware is fine for now, since we can modify the size as needed later on.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<figure>
-
-
-  <a data-fancybox="" href="updating.png" data-caption="You can update the size (i.e. it&rsquo;s currently ml.t2.medium) of the instance when it&rsquo;s stopped">
-
-
-  <img data-src="updating.png" class="lazyload" alt="" width="100%" height="100%">
-</a>
-
-
-  
-  
-  <figcaption data-pre="Figure " data-post=":" class="numbered">
-    You can update the size (i.e. it&rsquo;s currently ml.t2.medium) of the instance when it&rsquo;s stopped
-  </figcaption>
-
-
-</figure>
-
-<p>After creating and starting a notebook instance, you&rsquo;ll find a repository of example notebooks made by the AWS team for different machine learning use-cases. These notebooks contain code for implementing end-to-end data science pipelines, and are useful starting points when implementing your own.</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<figure>
-
-
-  <a data-fancybox="" href="SageMakerExamples.png" data-caption="Find examples of end-to-end pipelines here">
-
-
-  <img data-src="SageMakerExamples.png" class="lazyload" alt="" width="50%" height="50%">
-</a>
-
-
-  
-  
-  <figcaption data-pre="Figure " data-post=":" class="numbered">
-    Find examples of end-to-end pipelines here
-  </figcaption>
-
-
-</figure>
-
-<h4 id="cloudwatch-logs">CloudWatch Logs</h4>
-<p>The pipelines we run in SageMaker can be set-up programatically in notebooks using the SageMaker Python SDK, or through the SageMaker console otherwise. I prefer the former as the flow is more natural to me, having prototyped countless times with Jupyter Notebooks before. The latter is still worth noting and available as an option for those who prefer to code less.</p>
-<p>Using a notebook and the SDK however allows us to debug our code and monitor the progress of our processes better. To debug Python code in our local systems, we often add <code>print()</code> statements for monitoring the flow of our program. The AWS equivalent to <code>print()</code> is the <code>log()</code> command</p>
-<h4 id="cloudwatch-logs-1">CloudWatch Logs</h4>
-<h3 id="byo-deep-learning-model">BYO Deep Learning Model</h3>
-<p>As we are bringing a model artifact trained outside of AWS, we first have to make sure it&rsquo;s transferred to AWS S3 storage.</p>
-<ol>
-<li>Create an S3 bucket</li>
-</ol>
-<ul>
-<li>S3 in the AWS Console</li>
-<li>Create a bucket, give it a descriptive name. Take note of the region you&rsquo;re creating it in. This region should be the same as the Notebook Instance so the instance could connect to the bucket.</li>
-</ul>
-<ol start="2">
-<li>Create a Notebook Instance</li>
-</ol>
-<ul>
-<li>you will have to specify the instance size, version and bandwidth. The size can be altered later, so choose the smallest one for now to save on costs. The latest version will have the most up-to-date features. The bandwidth (i.e. include examples) is also alterable, so for now choose the smallest one.</li>
-<li>NB: Elastic inference</li>
-<li>Connect it to the S3 bucket you&rsquo;ve made in</li>
-</ul>
+      <p>This blog post turned into a Medium publication, 
+<a href="https://medium.com/chnnl/deploying-an-externally-trained-deep-learning-model-for-batch-inference-in-aws-2d0b21a0b7cd?source=friends_link&amp;sk=9128081a7864ce3a68ee0d1e1b40e095" target="_blank" rel="noopener">available here!</a>
+. This article is first of many hopefully :)</p>
 
     </div>
 
