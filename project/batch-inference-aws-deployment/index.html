@@ -28,10 +28,10 @@
   
     
   
-  <meta name="description" content="Used Selenium and Python&#39;s BeautifulSoup to scrape Salary Information from Glassdoor">
+  <meta name="description" content="I deploy a deep learning model trained for sentiment analysis outside of AWS in an AWS managed Docker container">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://nixramirez.github.io/project/data-scraping/">
+  <link rel="alternate" hreflang="en-us" href="https://nixramirez.github.io/project/batch-inference-aws-deployment/">
 
   
 
@@ -218,7 +218,7 @@
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://nixramirez.github.io/project/data-scraping/">
+  <link rel="canonical" href="https://nixramirez.github.io/project/batch-inference-aws-deployment/">
 
   
   
@@ -231,15 +231,13 @@
   <meta property="twitter:card" content="summary_large_image">
   
   <meta property="og:site_name" content="Hello, World">
-  <meta property="og:url" content="https://nixramirez.github.io/project/data-scraping/">
-  <meta property="og:title" content="Web Scraping | Hello, World">
-  <meta property="og:description" content="Used Selenium and Python&#39;s BeautifulSoup to scrape Salary Information from Glassdoor"><meta property="og:image" content="https://nixramirez.github.io/project/data-scraping/featured.jpg">
-  <meta property="twitter:image" content="https://nixramirez.github.io/project/data-scraping/featured.jpg"><meta property="og:locale" content="en-us">
+  <meta property="og:url" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/">
+  <meta property="og:title" content="Deploying a deep learning model in AWS | Hello, World">
+  <meta property="og:description" content="I deploy a deep learning model trained for sentiment analysis outside of AWS in an AWS managed Docker container"><meta property="og:image" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/featured.jpg">
+  <meta property="twitter:image" content="https://nixramirez.github.io/project/batch-inference-aws-deployment/featured.jpg"><meta property="og:locale" content="en-us">
   
     
-      <meta property="article:published_time" content="2020-02-27T00:00:00&#43;00:00">
     
-    <meta property="article:modified_time" content="2020-02-27T00:00:00&#43;00:00">
   
 
   
@@ -263,16 +261,16 @@
   "@type": "Article",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://nixramirez.github.io/project/data-scraping/"
+    "@id": "https://nixramirez.github.io/project/batch-inference-aws-deployment/"
   },
-  "headline": "Web Scraping",
+  "headline": "Deploying a deep learning model in AWS",
   
   "image": [
-    "https://nixramirez.github.io/project/data-scraping/featured.jpg"
+    "https://nixramirez.github.io/project/batch-inference-aws-deployment/featured.jpg"
   ],
   
-  "datePublished": "2020-02-27T00:00:00Z",
-  "dateModified": "2020-02-27T00:00:00Z",
+  "datePublished": "0001-01-01T00:00:00Z",
+  "dateModified": "0001-01-01T00:00:00Z",
   
   "author": {
     "@type": "Person",
@@ -287,7 +285,7 @@
       "url": "img/https://nixramirez.github.io/"
     }
   },
-  "description": "Used Selenium and Python's BeautifulSoup to scrape Salary Information from Glassdoor"
+  "description": "I deploy a deep learning model trained for sentiment analysis outside of AWS in an AWS managed Docker container"
 }
 </script>
 
@@ -305,7 +303,7 @@
 
 
 
-  <title>Web Scraping | Hello, World</title>
+  <title>Deploying a deep learning model in AWS | Hello, World</title>
 
 </head>
 
@@ -525,7 +523,7 @@
 
 
 <div class="article-container pt-3">
-  <h1>Web Scraping</h1>
+  <h1>Deploying a deep learning model in AWS</h1>
 
   
 
@@ -543,7 +541,7 @@
     
       
     
-    Feb 27, 2020
+    Jan 1, 0001
   </span>
   
 
@@ -578,10 +576,10 @@
 </div>
 
 
-<div class="article-header article-container featured-image-wrapper mt-4 mb-4" style="max-width: 720px; max-height: 480px;">
+<div class="article-header article-container featured-image-wrapper mt-4 mb-4" style="max-width: 720px; max-height: 372px;">
   <div style="position: relative">
-    <img src="/project/data-scraping/featured_hu3d03a01dcc18bc5be0e67db3d8d209a6_5118188_720x0_resize_q90_lanczos.jpg" alt="" class="featured-image">
-    <span class="article-header-caption">Web Scraping feels like Hacking!</span>
+    <img src="/project/batch-inference-aws-deployment/featured_hu16b65e548d64bbafce84cc3b9ea27216_115598_720x0_resize_q90_lanczos.jpg" alt="" class="featured-image">
+    
   </div>
 </div>
 
@@ -590,130 +588,116 @@
   <div class="article-container">
 
     <div class="article-style">
-      <h3 id="the-idea">The Idea</h3>
-<p>An ex-colleague, 
-<a href="https://www.linkedin.com/in/dhilip-subramanian-36021918b/" target="_blank" rel="noopener">Dhilip</a>
- and I wanted to do a series of end-to-end projects in Data Science and Analytics for fun and to pick up skills along the way that would serve our future careers in this space. When Dhilip approached me for project ideas, I already had one I&rsquo;ve thought about for quite some time.</p>
-<p>It was a timely project for us Qrious interns, who were deliberating on our next career move following the summer internship. Towards the end of our internship, a few of us (excluding me but including Dhilip) were graduating and applying for full-time jobs in the data space. Our discussions naturally gravitated to what starting pay we could expect for careers in data science, data engineering, and analytics. I imagined if we had an amount for each job averaged from recent, accurate salary data collected over a large number of companies operating in different industries, we had evidence to make sure future salary negotiations were fair!</p>
-<h3 id="the-execution">The Execution</h3>
-<p>Glassdoor is a job reviews site with job benefits and salary information reported anonymously by employees of various companies. It was our main data source for this project. Collecting a vast amount of data from the site would require automation, using a technique called <em>scraping</em>. This is a technique used to extract content from specific HTML tags in a webpage, and in our case, exploits two technologies to do so: Selenium and BeautifulSoup.</p>
-<p>Selenium is a Java-based tool used in website testing to automate specific interactions with webpages (i.e. clicking on links, logging in, navigating the page, etc). Since it automates interacting with the DOM, it&rsquo;s being used in Data Science to scrape data from websites. BeautifulSoup, on the other hand, is a Python library that parses HTML and makes it easy to extract specific elements from it.</p>
-<h3 id="the-code">The code</h3>
-<h4 id="1-first-we-import-the-necessary-libraries">1. First, we import the necessary libraries:</h4>
-<p><em>Python Selenium libraries (Scraping)</em></p>
+      <p>If you&rsquo;re a data professional working with machine learning models in the cloud, then you might be familiar with Amazon Web Services&rsquo; (AWS) SageMaker. 
+<a href="https://aws.amazon.com/sagemaker/" target="_blank" rel="noopener">SageMaker</a>
+ is AWS&rsquo; machine learning platform allowing developers to build, train, and deploy models in the cloud or in embedded systems and edge devices.</p>
+<p>There are a dizzying number of services available within SageMaker for all kinds of machine learning use-cases. For the sake of brevity in this post, we will only cover a specific use-case&ndash;that of bringing into AWS, and eventually deploying a deep learning model <strong>trained outside</strong> of the AWS ecosystem. We&rsquo;d also want the deployed model to perform predictions for a <strong>batch</strong> of data (i.e. multiple rows), as opposed to a single entry. Also, we&rsquo;d want the model to predict in <strong>serverless</strong> fashion, meaning we only invoke the model and the hardware powering it <strong>when we&rsquo;re doing predictions</strong>. Serverless is <em>pay-as-you-go</em>. The opposite of serverless would be to make the model&rsquo;s hardware <em>persist</em>, even when not actively predicting.</p>
+<p>In this post, we compare and contrast services relevant to our use-case and show how we deployed a deep learning model, trained outside AWS, for batch inference. You&rsquo;ll hopefully learn how model deployment in SageMaker works and get an overview of other SageMaker features.</p>
+<p>So let&rsquo;s dive right in!</p>
+<h3 id="the-sagemaker-platform">The SageMaker Platform</h3>
+<p>To help make sense of the various features SageMaker has, AWS offers a <em>fantastic</em> 
+<a href="">technical deep dive</a>
+ on the platform, which I&rsquo;d highly recommend you browse before reading SageMaker documentation.</p>
+<p>SageMaker also has a 
+<a href="">2 month free tier</a>
+ for hands-on tinkering with the platform, perfect for exploring what it offers!</p>
+<h4 id="notebooks-and-s3">Notebooks and S3</h4>
+<p>Central to SageMaker are 
+<a href="">Notebook Instances</a>
+, Jupyter Notebook environments running on EC2 instances that are fully managed by AWS upon creation. While the <em>fully managed</em> keyword implies that we can do very little altering of the EC2 instance&rsquo;s system save from some non-persistent shell commands, it also means we can use it out-of-the-box for running common data science packages.</p>
+<p>A Jupyter notebook inside an instance can hold code for reading data in, pre-processing it, using it to train a model, validating the model, and deploying it later. While we can think of a notebook as the front-end for our interactions with SageMaker, we can think of an S3 storage bucket as our back-end. Our notebook instance has to be connected to an S3 bucket to read data from or save/load model artefacts to/from.</p>
+<p><strong>NB:</strong> When we deploy a model trained in a notebook, we are not deploying the notebook itself. We&rsquo;re just using the notebook to <em>orchestrate</em> training, validation and deployment.</p>
+<p>We don&rsquo;t cover configuring Notebook Instances and S3 buckets here as there are a lot of tutorials on these subjects. Just make sure that the S3 bucket exists in the same region as the Notebook Instance for them to connect, and that going for the smallest compute hardware is fine for now, since we can modify the size as needed later on.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+
+
+  <a data-fancybox="" href="updating.png" data-caption="You can update the size (i.e. it&rsquo;s currently ml.t2.medium) of the instance when it&rsquo;s stopped">
+
+
+  <img data-src="updating.png" class="lazyload" alt="" width="100%" height="100%">
+</a>
+
+
+  
+  
+  <figcaption data-pre="Figure " data-post=":" class="numbered">
+    You can update the size (i.e. it&rsquo;s currently ml.t2.medium) of the instance when it&rsquo;s stopped
+  </figcaption>
+
+
+</figure>
+
+<p>After creating and starting a notebook instance, you&rsquo;ll find a repository of example notebooks made by the AWS team for different machine learning use-cases. These notebooks contain code for implementing end-to-end data science pipelines, and are useful starting points when implementing your own.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<figure>
+
+
+  <a data-fancybox="" href="SageMakerExamples.png" data-caption="Find examples of end-to-end pipelines here">
+
+
+  <img data-src="SageMakerExamples.png" class="lazyload" alt="" width="50%" height="50%">
+</a>
+
+
+  
+  
+  <figcaption data-pre="Figure " data-post=":" class="numbered">
+    Find examples of end-to-end pipelines here
+  </figcaption>
+
+
+</figure>
+
+<h4 id="cloudwatch-logs">CloudWatch Logs</h4>
+<p>The pipelines we run in SageMaker can be set-up programatically in notebooks using the SageMaker Python SDK, or through the SageMaker console otherwise. I prefer the former as the flow is more natural to me, having prototyped countless times with Jupyter Notebooks before. The latter is still worth noting and available as an option for those who prefer to code less.</p>
+<p>Using a notebook and the SDK however allows us to debug our code and monitor the progress of our processes better. To debug Python code in our local systems, we often add <code>print()</code> statements for monitoring the flow of our program. The AWS equivalent to <code>print()</code> is the <code>log()</code> command</p>
+<h4 id="cloudwatch-logs-1">CloudWatch Logs</h4>
+<h3 id="byo-deep-learning-model">BYO Deep Learning Model</h3>
+<p>As we are bringing a model artifact trained outside of AWS, we first have to make sure it&rsquo;s transferred to AWS S3 storage.</p>
+<ol>
+<li>Create an S3 bucket</li>
+</ol>
 <ul>
-<li>webdriver - contains tools for working with an automated web browser</li>
-<li>webdriver.chrome - specifies Google Chrome as our automated browser</li>
-<li>time - the sleep function allows our automated tasks (i.e. clicking on links) to have a delay. Important for not being blocked as a bot by some websites</li>
-<li>BeautifulSoup - a python library for parsing HTML pages and grabbing content from specific HTML tags easily</li>
-<li>lxml - a parser for BeautifulSoup, allowing the HTML pages to be parsed as xml (and queried with xPath)</li>
+<li>S3 in the AWS Console</li>
+<li>Create a bucket, give it a descriptive name. Take note of the region you&rsquo;re creating it in. This region should be the same as the Notebook Instance so the instance could connect to the bucket.</li>
 </ul>
-<p><em>Standard Python Libraries</em></p>
+<ol start="2">
+<li>Create a Notebook Instance</li>
+</ol>
 <ul>
-<li>pandas - a library for working with data-frames</li>
-<li>csv - a tool for reading and writing CSV files</li>
-<li>itertools - an iterator library</li>
+<li>you will have to specify the instance size, version and bandwidth. The size can be altered later, so choose the smallest one for now to save on costs. The latest version will have the most up-to-date features. The bandwidth (i.e. include examples) is also alterable, so for now choose the smallest one.</li>
+<li>NB: Elastic inference</li>
+<li>Connect it to the S3 bucket you&rsquo;ve made in</li>
 </ul>
-<pre><code class="language-python">from selenium import webdriver 
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from time import sleep
-from bs4 import BeautifulSoup
-import lxml
-
-import pandas as pd 
-import csv
-from itertools import zip_longest
-</code></pre>
-<h4 id="2-then-we-set-up-an-automated-browser-for-scraping">2. Then, we set up an automated browser for scraping</h4>
-<p>In this step, we navigate to 
-<a href="https://www.glassdoor.co.nz/Salaries/index.htm" target="_blank" rel="noopener">Glassdoor&rsquo;s Salaries page</a>
- and type in whatever Job Title we&rsquo;d want salaries for, in whatever location. In this example, we&rsquo;d want to grab Data Engineers&rsquo; salary information from the United States. We have to be logged into a Glassdoor account to do this.</p>
-<p>We then copy paste the URL of the resulting page into the driver.get(url) method below.</p>
-<p>Next, we find the <em>last page of results</em> Glassdoor has for this particular search. This is important as we&rsquo;re setting up our browser to automatically cycle through all pages of the search, grabbing salary information from each. We do this by modifying the URL in our browser, adding the string <em>_IP1500</em> just before the <em>.htm</em>. This lets us jump to the very last page of salary information, as it is likely that there won&rsquo;t be 1500 pages worth of search results. If there is, just adjust the IP number to be larger.</p>
-<p>Once we&rsquo;ve jumped to the last page of results, note down what that page is (by looking at the last number in the carousel button as such (red in the image below):</p>
-<p><img src="LastPageScrape.png" alt="last page scraping"></p>
-<p>and copying that number onto the lastPageNo variable in the below code. In below&rsquo;s example, page 191 is the last page, and the for loop cycles through each page until it reaches that, employing a delay of at least 1.5s before it goes on to the next page.</p>
-<pre><code class="language-python">#creating empty arrays to hold job title, company name, job mean pay and pay range information
-job_title = []
-company_name = []
-mean_pay = []
-pay_range = []
-
-lastPageNo = 191;
-
-#going through 184 pages of salary information
-for pageno in range(1,lastPageNo):
-
-    driver = webdriver.Chrome(ChromeDriverManager().install())
-    
-    #getting webpage in glassdoor
-    if pageno == 1:
-        driver.get(&quot;https://www.glassdoor.co.nz/Salaries/us-data-engineer-salary-SRCH_IL.0,2_IN1_KO3,16.htm&quot;)
-    else:
-        driver.get(
-            &quot;https://www.glassdoor.co.nz/Salaries/us-data-engineer-salary-SRCH_IL.0,2_IN1_KO3,16.htm&quot; + &quot;_IP&quot; + str(pageno) + &quot;.htm&quot;
-        )
-    time.sleep(1.5)
-</code></pre>
-<h4 id="3-we-parse-the-html-of-each-search-result-pageand-scrape">3. We parse the HTML of each search result page&hellip;and SCRAPE!</h4>
-<p>&hellip;Using Beautifulsoup. The <em>page_source</em> attribute of the driver grabs the page with its corresponding HTML tags, and parses it with <strong>lxml</strong>, which as mentioned above, allows us to query the results using xpath if we wished.</p>
-<p>After parsing, we then grab specific HTML content. We do this by:</p>
-<ul>
-<li>Inspecting the html tags where our information lies, by using Google Chrome&rsquo;s <em>inspect</em> option</li>
-<li>Collecting information that would distinguish our target HTML tag/s from others</li>
-</ul>
-<p>Tag Classes and IDs are useful for this. We see in the below screenshot, for example, that each salary block is enclosed by a <code>&lt;div&gt;</code> with class <strong>&ldquo;row align-items-center m-0 salaryRow__SalaryRowStyle__row&rdquo;</strong>. To grab each salary block from a page, we then use BeautifulSoup&rsquo;s findAll() method, passing on the <code>&lt;div class=&quot;&quot;&gt;</code> information mentioned.</p>
-<p><img src="salaryBlocks.png" alt="salary blocks enclosed in divs"></p>
-<p>We do the same for every piece of information we want (i.e. job titles, company name, average salary, and salary range in this example).
-These bits of info were obtained the same way as above. We looped through each salary block above to grab the specific information, as the below code shows.</p>
-<pre><code class="language-python">    #continuation from code above (still inside the for loop)
-    #parsing the page through lxml option of beautifulsoup
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'lxml')
-
-    #getting each salary block
-    salaryBlocks = soup.findAll(&quot;div&quot;, {'class' : 'row align-items-center m-0 salaryRow__SalaryRowStyle__row'})
-
-    #for each salary block, find the job title, company name, average pay, and pay range, and append them to the lists initialised above
-    for block in salaryBlocks:
-        entry = []
-
-        jobTitle = block.find(&quot;div&quot;, {'class' : 'salaryRow__JobInfoStyle__jobTitle strong'}).find(&quot;a&quot;).text
-        job_title.append(jobTitle)
-
-        companyName = block.find(&quot;div&quot;, {'class' : 'salaryRow__JobInfoStyle__employerName'}).text
-        company_name.append(companyName)
-
-        meanPay = block.find(&quot;div&quot;, {'class' : 'salaryRow__JobInfoStyle__meanBasePay common__formFactorHelpers__showHH'}).find('span').text
-        mean_pay.append(meanPay)
-        
-        #if a pay range exists, grab it, otherwise, indicate none exists
-        try:
-            if block.find(&quot;div&quot;, {'class' : 'col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt'}).find(&quot;div&quot;, {'class' : 'strong'}):
-                payRange = block.find(&quot;div&quot;, {'class' : 'col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt'}).find(&quot;div&quot;, {'class' : 'strong'}).text
-                pay_range.append(payRange)
-            elif block.find(&quot;div&quot;, {'class' : 'col-2 d-none d-md-block px-0 py salaryRow__SalaryRowStyle__amt'}).find(&quot;span&quot;, {'class' : 'strong'}):
-                pay_range.append(&quot;N/A&quot;)
-        except:
-            pay_range.append(&quot;N/A&quot;)
-
-        driver.quit()
-</code></pre>
-<h4 id="4-we-save-the-results-to-a-csv-file">4. We save the results to a .csv file</h4>
-<p>Once we&rsquo;ve obtained all the information we need, we store them into a python data-frame, which allows us to store the data in a tabular format. The columns of the table correspond to job title, company name, mean pay, and the pay range, whilst the rows are individual companies.</p>
-<p>The below code shows how the results are stored in a data-frame and eventually converted to a .csv file for easy reading into your favourite data analysis program/language later on.</p>
-<pre><code class="language-python">#process the lists into a final dataframe, and save to a CSV
-final = []
-for item in zip_longest(job_title, company_name, mean_pay, pay_range):
-    final.append(item)
-
-df = pd.DataFrame(
-    final, columns=['jobTitle', 'companyName', 'meanPay', 'payRange'])
-
-df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
-</code></pre>
-<p><em>The final output of this scraping is a 28,000 row file, containing salary information for Data Engineers, Analysts, Scientists, and Machine Learning Engineers in Australia, New Zealand, and the United States. The file can be downloaded <a href="/files/Data-Professional-Salaries-Master.csv" target="_blank">here</a> for free :)</em></p>
 
     </div>
 
@@ -726,6 +710,8 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
 <div class="article-tags">
   
   <a class="badge badge-light" href="/tags/data-projects/">Data Projects</a>
+  
+  <a class="badge badge-light" href="/tags/programming/">Programming</a>
   
 </div>
 
@@ -742,7 +728,7 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://nixramirez.github.io/project/data-scraping/&amp;text=Web%20Scraping" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=https://nixramirez.github.io/project/batch-inference-aws-deployment/&amp;text=Deploying%20a%20deep%20learning%20model%20in%20AWS" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -755,7 +741,7 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://nixramirez.github.io/project/data-scraping/&amp;t=Web%20Scraping" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=https://nixramirez.github.io/project/batch-inference-aws-deployment/&amp;t=Deploying%20a%20deep%20learning%20model%20in%20AWS" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -768,7 +754,7 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
       
       
       <li>
-        <a href="mailto:?subject=Web%20Scraping&amp;body=https://nixramirez.github.io/project/data-scraping/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Deploying%20a%20deep%20learning%20model%20in%20AWS&amp;body=https://nixramirez.github.io/project/batch-inference-aws-deployment/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -781,7 +767,7 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://nixramirez.github.io/project/data-scraping/&amp;title=Web%20Scraping" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=https://nixramirez.github.io/project/batch-inference-aws-deployment/&amp;title=Deploying%20a%20deep%20learning%20model%20in%20AWS" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -794,7 +780,7 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Web%20Scraping%20https://nixramirez.github.io/project/data-scraping/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Deploying%20a%20deep%20learning%20model%20in%20AWS%20https://nixramirez.github.io/project/batch-inference-aws-deployment/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -807,7 +793,7 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://nixramirez.github.io/project/data-scraping/&amp;title=Web%20Scraping" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=https://nixramirez.github.io/project/batch-inference-aws-deployment/&amp;title=Deploying%20a%20deep%20learning%20model%20in%20AWS" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
@@ -920,7 +906,15 @@ df.to_csv(&quot;Data Engineer Salaries United States.csv&quot;)
     <h3>Related</h3>
     <ul>
       
-      <li><a href="/project/batch-inference-aws-deployment/">Deploying a deep learning model in AWS</a></li>
+      <li><a href="/project/intro-to-data-visualisation/">Intro to Data Visualisation Workshop</a></li>
+      
+      <li><a href="/project/classifier-diagnostics/">Assessing Classification Models</a></li>
+      
+      <li><a href="/project/reactfirstproj/">Detecting Seasons in React.js</a></li>
+      
+      <li><a href="/project/pythonworkshop/">Intro To Python Workshop</a></li>
+      
+      <li><a href="/project/bert-emotion-classification/">Multi-Class Emotion Classification with Deep Learning using BERT</a></li>
       
     </ul>
   </div>
